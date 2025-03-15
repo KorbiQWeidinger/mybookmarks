@@ -24,5 +24,4 @@ dist-ssr
 *.sw?
 
 .vite
-.package-lock.json
 .env
