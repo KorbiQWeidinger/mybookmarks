@@ -1,18 +1,19 @@
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import type { ViewType } from "@/lib/types"
-import { Plus, Search } from "lucide-react"
-import { useState } from "react"
-import { BookmarkModal } from "./bookmark-modal"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Plus, Search } from "lucide-react";
+import { useState } from "react";
+import { BookmarkModal } from "./bookmark-modal";
 
 interface BookmarkHeaderProps {
-  searchQuery: string
-  onSearchChange: (query: string) => void
-  viewType: ViewType
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
 }
 
-export function BookmarkHeader({ searchQuery, onSearchChange, viewType }: BookmarkHeaderProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+export function BookmarkHeader({
+  searchQuery,
+  onSearchChange,
+}: BookmarkHeaderProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <div className="p-4 border-b sticky top-0 bg-background z-10">
@@ -27,14 +28,21 @@ export function BookmarkHeader({ searchQuery, onSearchChange, viewType }: Bookma
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
-        <Button size="icon" className="flex-shrink-0" title="Add bookmark" onClick={() => setIsModalOpen(true)}>
+        <Button
+          size="icon"
+          className="flex-shrink-0"
+          title="Add bookmark"
+          onClick={() => setIsModalOpen(true)}
+        >
           <Plus className="h-4 w-4" />
           <span className="sr-only">Add bookmark</span>
         </Button>
       </div>
 
-      <BookmarkModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <BookmarkModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
-  )
+  );
 }
-
