@@ -80,6 +80,10 @@ export const { actions, reducer } = createSlice({
       }));
       saveBookmarksToStorage(state.bookmarks);
     },
+    clearAllBookmarks: (state) => {
+      state.bookmarks = [];
+      saveBookmarksToStorage(state.bookmarks);
+    },
   },
 });
 
