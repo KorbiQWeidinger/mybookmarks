@@ -1,4 +1,4 @@
-import BookmarkManager from '@/features/bookmarks/components/bookmark-manager';
+import { BookmarkManager } from '@/features/bookmarks/components/bookmark-manager';
 
 export function BookmarksPage() {
   return (

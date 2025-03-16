@@ -15,6 +15,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { X, Plus } from 'lucide-react';
+import { useAppDispatch } from '@/store';
+import { actions } from '@/store/slices/bookmarks-slice';
 
 interface BookmarkModalProps {
   isOpen: boolean;
@@ -22,6 +24,7 @@ interface BookmarkModalProps {
 }
 
 export function BookmarkModal({ isOpen, onClose }: BookmarkModalProps) {
+  const dispatch = useAppDispatch();
   const [formData, setFormData] = useState({
     title: '',
     url: '',
@@ -56,6 +59,31 @@ export function BookmarkModal({ isOpen, onClose }: BookmarkModalProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Extract domain from URL
+    let domain = '';
+    try {
+      const url = new URL(formData.url);
+      domain = url.hostname.replace('www.', '');
+    } catch (error) {
+      console.error('Invalid URL:', error);
+      // Use the URL as is if it's invalid
+      domain = formData.url;
+    }
+
+    // Create new bookmark
+    dispatch(
+      actions.addBookmark({
+        title: formData.title,
+        url: formData.url,
+        description: formData.description,
+        domain,
+        tags,
+        createdAt: new Date(),
+        favicon: `https://${domain}/favicon.ico`,
+      })
+    );
+
     // Reset form and close modal
     setFormData({ title: '', url: '', description: '' });
     setTags([]);

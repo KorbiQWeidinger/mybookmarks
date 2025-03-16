@@ -4,9 +4,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import type { ViewType, Tag, Persona } from '@/lib/types';
-import { Bookmark, FolderKanban, Hash, Menu, Search, X } from 'lucide-react';
-import { UserNav } from './user-nav';
+import type { ViewType, Tag } from '@/lib/types';
+import { Bookmark, FolderKanban, Hash, Menu, Search, X, Settings } from 'lucide-react';
 
 interface SidebarProps {
   viewType: ViewType;
@@ -17,9 +16,6 @@ interface SidebarProps {
   selectedDomain: string | null;
   onTagSelect: (tag: string) => void;
   onDomainSelect: (domain: string) => void;
-  currentPersona: Persona;
-  personas: Persona[];
-  onPersonaChange: (persona: Persona) => void;
   onOpenSettings: () => void;
 }
 
@@ -32,9 +28,6 @@ export function Sidebar({
   selectedDomain,
   onTagSelect,
   onDomainSelect,
-  currentPersona,
-  personas,
-  onPersonaChange,
   onOpenSettings,
 }: SidebarProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -185,14 +178,12 @@ export function Sidebar({
           )}
         </ScrollArea>
 
-        {/* User navigation at bottom of sidebar */}
+        {/* Settings button at bottom of sidebar */}
         <div className='border-t p-4'>
-          <UserNav
-            currentPersona={currentPersona}
-            personas={personas}
-            onPersonaChange={onPersonaChange}
-            onOpenSettings={onOpenSettings}
-          />
+          <Button variant='ghost' className='w-full justify-start gap-2' onClick={onOpenSettings}>
+            <Settings className='h-4 w-4' />
+            <span>Settings</span>
+          </Button>
         </div>
       </div>
     </>

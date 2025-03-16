@@ -7,8 +7,11 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import type { Bookmark } from '@/lib/types';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Trash2 } from 'lucide-react';
+import { useAppDispatch } from '@/store';
+import { actions } from '@/store/slices/bookmarks-slice';
 
 interface BookmarkTableProps {
   bookmarks: Bookmark[];
@@ -17,6 +20,14 @@ interface BookmarkTableProps {
 }
 
 export function BookmarkTable({ bookmarks, selectedTags, onTagSelect }: BookmarkTableProps) {
+  const dispatch = useAppDispatch();
+
+  const handleDelete = (id: string) => {
+    if (confirm('Are you sure you want to delete this bookmark?')) {
+      dispatch(actions.deleteBookmark(id));
+    }
+  };
+
   return (
     <div className='w-full overflow-auto'>
       <Table>
@@ -25,6 +36,7 @@ export function BookmarkTable({ bookmarks, selectedTags, onTagSelect }: Bookmark
             <TableHead className='w-[300px]'>Title</TableHead>
             <TableHead className='hidden md:table-cell'>Description</TableHead>
             <TableHead className='w-[300px]'>Tags</TableHead>
+            <TableHead className='w-[50px]'></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -37,6 +49,9 @@ export function BookmarkTable({ bookmarks, selectedTags, onTagSelect }: Bookmark
                       src={bookmark.favicon || '/placeholder.svg'}
                       alt=''
                       className='w-4 h-4 mt-1'
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
                     />
                   )}
                   <div>
@@ -49,9 +64,7 @@ export function BookmarkTable({ bookmarks, selectedTags, onTagSelect }: Bookmark
                       <span>{bookmark.title}</span>
                       <ExternalLink className='h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity' />
                     </a>
-                    <p className='text-xs text-muted-foreground'>
-                      {new URL(bookmark.url).hostname}
-                    </p>
+                    <p className='text-xs text-muted-foreground'>{bookmark.domain}</p>
                   </div>
                 </div>
               </TableCell>
@@ -78,6 +91,18 @@ export function BookmarkTable({ bookmarks, selectedTags, onTagSelect }: Bookmark
                     </div>
                   )}
                 </div>
+              </TableCell>
+              <TableCell>
+                <Button
+                  variant='ghost'
+                  size='icon'
+                  className='h-8 w-8 text-muted-foreground hover:text-destructive'
+                  onClick={() => handleDelete(bookmark.id)}
+                  title='Delete bookmark'
+                >
+                  <Trash2 className='h-4 w-4' />
+                  <span className='sr-only'>Delete</span>
+                </Button>
               </TableCell>
             </TableRow>
           ))}

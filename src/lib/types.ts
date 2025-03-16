@@ -9,7 +9,6 @@ export interface Bookmark {
   favicon?: string;
   tags: string[];
   createdAt: Date;
-  personaId: string; // Added personaId to associate bookmarks with personas
 }
 
 export interface Tag {
