@@ -5,14 +5,14 @@ import { BookmarkList } from './bookmark-list';
 import type { ViewType } from '@/lib/types';
 import { useAppSelector } from '@/store';
 import { selectors } from '@/store/slices/bookmarks-slice';
-import { Button } from '@/components/ui/button';
+import { SettingsModal } from '@/features/settings';
 
 export function BookmarkManager() {
   const [viewType, setViewType] = useState<ViewType>('domain');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
-  const [showSettings, setShowSettings] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Get bookmarks from Redux store
   const bookmarks = useAppSelector(selectors.selectAllBookmarks);
@@ -59,11 +59,6 @@ export function BookmarkManager() {
     setSelectedDomain((prev) => (prev === domain ? null : domain));
   };
 
-  const handleOpenSettings = () => {
-    setShowSettings(true);
-    // In a real app, this would open the settings modal or navigate to settings page
-  };
-
   return (
     <div className='flex h-screen overflow-hidden'>
       <Sidebar
@@ -75,7 +70,6 @@ export function BookmarkManager() {
         selectedDomain={selectedDomain}
         onTagSelect={handleTagSelect}
         onDomainSelect={handleDomainSelect}
-        onOpenSettings={handleOpenSettings}
       />
       <div className='flex flex-col flex-1 overflow-hidden'>
         <BookmarkHeader searchQuery={searchQuery} onSearchChange={handleSearchChange} />
@@ -85,26 +79,10 @@ export function BookmarkManager() {
           selectedTags={selectedTags}
           onTagSelect={handleTagSelect}
         />
-
-        {/* Settings Modal would go here in a real app */}
-        {showSettings && (
-          <div
-            className='fixed inset-0 bg-black/50 flex items-center justify-center z-50'
-            onClick={() => setShowSettings(false)}
-          >
-            <div
-              className='bg-background p-6 rounded-lg shadow-lg max-w-md w-full'
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h2 className='text-xl font-bold mb-4'>Settings</h2>
-              <p className='mb-4'>This is where you would configure your bookmark settings.</p>
-              <div className='border-t pt-4 mt-4'>
-                <Button onClick={() => setShowSettings(false)}>Close Settings</Button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* Settings Modal */}
+      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 }

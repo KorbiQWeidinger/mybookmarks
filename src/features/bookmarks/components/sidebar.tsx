@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import type { ViewType, Tag } from '@/lib/types';
 import { Bookmark, FolderKanban, Hash, Menu, Search, X, Settings } from 'lucide-react';
+import { SettingsModal } from '@/features/settings';
 
 interface SidebarProps {
   viewType: ViewType;
@@ -16,7 +17,6 @@ interface SidebarProps {
   selectedDomain: string | null;
   onTagSelect: (tag: string) => void;
   onDomainSelect: (domain: string) => void;
-  onOpenSettings: () => void;
 }
 
 // Reusable search input component
@@ -155,9 +155,9 @@ export function Sidebar({
   selectedDomain,
   onTagSelect,
   onDomainSelect,
-  onOpenSettings,
 }: SidebarProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   return (
     <>
@@ -226,12 +226,19 @@ export function Sidebar({
 
         {/* Settings button at bottom of sidebar */}
         <div className='border-t p-4'>
-          <Button variant='ghost' className='w-full justify-start gap-2' onClick={onOpenSettings}>
+          <Button
+            variant='ghost'
+            className='w-full justify-start gap-2'
+            onClick={() => setIsSettingsOpen(true)}
+          >
             <Settings className='h-4 w-4' />
             <span>Settings</span>
           </Button>
         </div>
       </div>
+
+      {/* Settings Modal */}
+      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </>
   );
 }
