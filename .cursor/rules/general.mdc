@@ -11,6 +11,7 @@ Avoid code duplications, however do not overcomplicate things.
 Look at the project structure and follow it! 
 Look at the file naming conventions and follow them!
 Do not use default exports!
+Do NOT try to run the app! It is running
 
 ## Tech Stack
 
@@ -35,7 +36,8 @@ npx shadcn@latest add XXX
 ## Commiting changes
 
 Use conventional commits. Append the commit message with (ai) to signal that the changes where ai generated.
-Use the command
+Use the command `acm` this will add all changes `git add .` and then commit with a message! 
+Always use this command to submit changes!
 
 ```
 git acm "xxx: ... (ai)"

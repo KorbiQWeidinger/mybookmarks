@@ -6,8 +6,8 @@ export const Routes = () => {
   return (
     <Router>
       <RouterRoutes>
-        <Route path='/' element={<LandingPage />} />
-        <Route path='/bookmarks' element={<BookmarksPage />} />
+        <Route path='/landing' element={<LandingPage />} />
+        <Route path='/' element={<BookmarksPage />} />
       </RouterRoutes>
     </Router>
   );
