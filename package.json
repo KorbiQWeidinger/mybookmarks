@@ -12,7 +12,9 @@
     "prepare": "husky",
     "test": "vitest run",
     "test:ui": "vitest --ui",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "prettier:write": "prettier --write .",
+    "eslint:fix": "eslint --fix ."
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.3",
