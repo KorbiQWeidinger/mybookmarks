@@ -61,6 +61,17 @@ export const { actions, reducer } = createSlice({
       state.bookmarks = state.bookmarks.filter((bookmark) => bookmark.id !== action.payload);
       saveBookmarksToStorage(state.bookmarks);
     },
+    removeTagFromBookmark: (state, action: PayloadAction<{ bookmarkId: string; tag: string }>) => {
+      const { bookmarkId, tag } = action.payload;
+      const bookmarkIndex = state.bookmarks.findIndex((bookmark) => bookmark.id === bookmarkId);
+
+      if (bookmarkIndex !== -1) {
+        state.bookmarks[bookmarkIndex].tags = state.bookmarks[bookmarkIndex].tags.filter(
+          (t) => t !== tag
+        );
+        saveBookmarksToStorage(state.bookmarks);
+      }
+    },
   },
 });
 

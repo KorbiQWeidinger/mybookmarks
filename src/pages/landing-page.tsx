@@ -16,7 +16,7 @@ export function LandingPage() {
       <section className='space-y-4 text-center'>
         <h2 className='text-2xl font-semibold'>Setup Instructions</h2>
         <div className='space-y-2 text-muted-foreground'>
-          <p>For the best experience, set My Bookmarks as your browser's default new tab page</p>
+          <p>For the best experience, set MyBookmarks as your browser's default new tab page</p>
           <div className='text-sm space-y-1'>
             <p>
               <strong>Chrome:</strong> Settings → On startup → Open a specific page → Add a new page
@@ -31,11 +31,6 @@ export function LandingPage() {
               Enter URL
             </p>
           </div>
-          <p className='mt-4'>
-            <strong>Import Your Bookmarks:</strong> You can easily import your existing browser
-            bookmarks through the settings page. Simply go to Settings and use the "Import
-            Bookmarks" feature to transfer your bookmarks from your browser.
-          </p>
         </div>
       </section>
 
