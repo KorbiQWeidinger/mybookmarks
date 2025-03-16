@@ -9,18 +9,6 @@ import { Bookmark, FolderKanban, Hash, Menu, Search, X, Settings } from 'lucide-
 import { SettingsModal } from '@/features/settings';
 import { BookmarkTag } from './bookmark-tag';
 import { useAppDispatch } from '@/store';
-import { actions } from '@/store/slices/bookmarks-slice';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-
 interface SidebarProps {
   viewType: ViewType;
   onViewChange: (view: ViewType) => void;
@@ -141,7 +129,7 @@ function TagList({ tags, selectedTags, onTagSelect }: TagListProps) {
       <SectionTitle title='Tags' />
 
       {filteredTags.length > 0 ? (
-        <div className='flex flex-wrap gap-2'>
+        <div className='flex flex-col space-y-2 w-full'>
           {filteredTags.map((tag) => (
             <BookmarkTag
               key={tag.id}
@@ -151,6 +139,7 @@ function TagList({ tags, selectedTags, onTagSelect }: TagListProps) {
               onClick={onTagSelect}
               variant='trash'
               allTags={tags}
+              className='w-full justify-start'
             />
           ))}
         </div>

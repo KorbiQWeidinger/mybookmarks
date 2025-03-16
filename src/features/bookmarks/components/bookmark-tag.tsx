@@ -26,6 +26,7 @@ interface BookmarkTagProps {
   onRemove?: (tag: string, e: MouseEvent) => void;
   variant?: 'x' | 'trash';
   allTags?: { id: string; name: string; count: number }[];
+  className?: string;
 }
 
 export function BookmarkTag({
@@ -37,6 +38,7 @@ export function BookmarkTag({
   onRemove,
   variant = 'x',
   allTags = [],
+  className,
 }: BookmarkTagProps) {
   const dispatch = useAppDispatch();
   const [isEditing, setIsEditing] = useState(false);
@@ -160,41 +162,47 @@ export function BookmarkTag({
     <>
       <Badge
         variant={isSelected ? 'default' : 'outline'}
-        className='cursor-pointer text-xs mb-1 group relative transition-all duration-200 hover:pr-10'
+        className={cn(
+          'cursor-pointer text-xs mb-1 group relative transition-all duration-200',
+          'flex items-center hover:pr-14',
+          className
+        )}
         onClick={onClick ? () => onClick(tag) : undefined}
       >
-        <span>
+        <span className='truncate flex-1'>
           {tag}
           {count !== undefined && ` (${count})`}
         </span>
-        <Button
-          variant='ghost'
-          size='icon-sm'
-          className={cn(
-            'absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity p-0 px-1 h-3 w-3 hover:bg-muted/60 rounded-sm',
-            'hover:text-muted-foreground'
-          )}
-          onClick={handleEdit}
-          onMouseDown={(e) => e.stopPropagation()}
-          title='Edit tag'
-          type='button'
-        >
-          <Pencil size={10} />
-        </Button>
-        <Button
-          variant='ghost'
-          size='icon-sm'
-          className={cn(
-            'absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity p-0 px-1 h-3 w-3 hover:bg-muted/60 rounded-sm',
-            variant === 'trash' ? 'hover:text-destructive' : 'hover:text-muted-foreground'
-          )}
-          onClick={handleRemove}
-          onMouseDown={(e) => e.stopPropagation()}
-          title='Remove tag'
-          type='button'
-        >
-          {variant === 'x' ? <X size={10} /> : <Trash2 size={10} />}
-        </Button>
+        <div className='absolute right-1 flex items-center h-full opacity-0 group-hover:opacity-100 transition-opacity'>
+          <Button
+            variant='ghost'
+            size='icon-sm'
+            className={cn(
+              'p-0 h-3 w-3 hover:bg-muted/60 rounded-sm',
+              'hover:text-muted-foreground'
+            )}
+            onClick={handleEdit}
+            onMouseDown={(e) => e.stopPropagation()}
+            title='Edit tag'
+            type='button'
+          >
+            <Pencil size={10} />
+          </Button>
+          <Button
+            variant='ghost'
+            size='icon-sm'
+            className={cn(
+              'p-0 px-1 h-3 w-3 hover:bg-muted/60 rounded-sm ml-1',
+              variant === 'trash' ? 'hover:text-destructive' : 'hover:text-muted-foreground'
+            )}
+            onClick={handleRemove}
+            onMouseDown={(e) => e.stopPropagation()}
+            title='Remove tag'
+            type='button'
+          >
+            {variant === 'x' ? <X size={14} /> : <Trash2 size={10} />}
+          </Button>
+        </div>
       </Badge>
 
       {/* Merge Tag Dialog */}
