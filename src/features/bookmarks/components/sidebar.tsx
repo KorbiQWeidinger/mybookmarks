@@ -8,7 +8,6 @@ import type { ViewType, Tag } from '@/lib/Bookmark';
 import { Bookmark, FolderKanban, Hash, Menu, Search, X, Settings } from 'lucide-react';
 import { SettingsModal } from '@/features/settings';
 import { BookmarkTag } from './bookmark-tag';
-import { useAppDispatch } from '@/store';
 interface SidebarProps {
   viewType: ViewType;
   onViewChange: (view: ViewType) => void;
