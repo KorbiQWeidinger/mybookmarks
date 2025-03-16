@@ -1,11 +1,11 @@
 {
-  "name": "vite-shadcn",
+  "name": "mybookmarks",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "homepage": ".",
   "scripts": {
-    "dev": "vite --base=/vite-shadcn/",
+    "dev": "vite --base=/mybookmarks/",
     "build": "tsc -p tsconfig.app.json && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
