@@ -129,7 +129,7 @@ function TagList({ tags, selectedTags, onTagSelect }: TagListProps) {
       <SectionTitle title='Tags' />
 
       {filteredTags.length > 0 ? (
-        <div className='flex flex-col space-y-2 w-full'>
+        <div className='flex flex-col space-y-2'>
           {filteredTags.map((tag) => (
             <BookmarkTag
               key={tag.id}
@@ -139,7 +139,7 @@ function TagList({ tags, selectedTags, onTagSelect }: TagListProps) {
               onClick={onTagSelect}
               variant='trash'
               allTags={tags}
-              className='w-full justify-start'
+              className='inline-flex'
             />
           ))}
         </div>

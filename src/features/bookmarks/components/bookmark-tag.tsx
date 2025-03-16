@@ -164,12 +164,12 @@ export function BookmarkTag({
         variant={isSelected ? 'default' : 'outline'}
         className={cn(
           'cursor-pointer text-xs mb-1 group relative transition-all duration-200',
-          'flex items-center hover:pr-14',
+          'inline-flex items-center hover:pr-12',
           className
         )}
         onClick={onClick ? () => onClick(tag) : undefined}
       >
-        <span className='truncate flex-1'>
+        <span>
           {tag}
           {count !== undefined && ` (${count})`}
         </span>
