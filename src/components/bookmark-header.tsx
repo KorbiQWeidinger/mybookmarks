@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import type { ViewType } from '@/lib/types';
 import { Plus, Search } from 'lucide-react';
 import { useState } from 'react';
 import { BookmarkModal } from './bookmark-modal';
@@ -8,10 +7,9 @@ import { BookmarkModal } from './bookmark-modal';
 interface BookmarkHeaderProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
-  viewType: ViewType;
 }
 
-export function BookmarkHeader({ searchQuery, onSearchChange, viewType }: BookmarkHeaderProps) {
+export function BookmarkHeader({ searchQuery, onSearchChange }: BookmarkHeaderProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (

@@ -206,11 +206,7 @@ export default function BookmarkManager() {
         onOpenSettings={handleOpenSettings}
       />
       <div className='flex flex-col flex-1 overflow-hidden'>
-        <BookmarkHeader
-          searchQuery={searchQuery}
-          onSearchChange={handleSearchChange}
-          viewType={viewType}
-        />
+        <BookmarkHeader searchQuery={searchQuery} onSearchChange={handleSearchChange} />
         <BookmarkList
           bookmarks={filteredBookmarks}
           viewType={viewType}
