@@ -37,12 +37,22 @@ export function BookmarkList({
         )
       : { 'All Bookmarks': bookmarks };
 
+  // Sort bookmarks within each group alphabetically by title
+  Object.keys(groupedBookmarks).forEach((domain) => {
+    groupedBookmarks[domain].sort((a, b) => a.title.localeCompare(b.title));
+  });
+
+  // Sort domain groups alphabetically
+  const sortedGroupEntries = Object.entries(groupedBookmarks).sort(([domainA], [domainB]) =>
+    domainA.localeCompare(domainB)
+  );
+
   return (
     <>
       <div className='flex-1 overflow-hidden'>
         <ScrollArea className='h-full'>
           <div className='p-4'>
-            {Object.entries(groupedBookmarks).map(([groupName, bookmarks]) => (
+            {sortedGroupEntries.map(([groupName, bookmarks]) => (
               <div key={groupName} className='mb-8'>
                 {viewType === 'domain' && (
                   <h2 className='text-lg font-semibold mb-4 flex items-center'>

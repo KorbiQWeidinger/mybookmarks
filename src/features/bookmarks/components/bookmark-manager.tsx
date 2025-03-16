@@ -19,6 +19,10 @@ export function BookmarkManager() {
   const allTags = useAppSelector(selectors.selectAllTags);
   const domains = useAppSelector(selectors.selectAllDomains);
 
+  // Sort tags and domains alphabetically
+  const sortedTags = [...allTags].sort((a, b) => a.name.localeCompare(b.name));
+  const sortedDomains = [...domains].sort((a, b) => a.name.localeCompare(b.name));
+
   // Filter bookmarks based on search query, selected tags, and selected domain
   const filteredBookmarks = bookmarks.filter((bookmark) => {
     const matchesSearch = searchQuery
@@ -34,6 +38,9 @@ export function BookmarkManager() {
 
     return matchesSearch && matchesTags && matchesDomain;
   });
+
+  // Sort bookmarks by domain
+  const sortedBookmarks = [...filteredBookmarks].sort((a, b) => a.domain.localeCompare(b.domain));
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
@@ -64,8 +71,8 @@ export function BookmarkManager() {
       <Sidebar
         viewType={viewType}
         onViewChange={handleViewChange}
-        tags={allTags}
-        domains={domains}
+        tags={sortedTags}
+        domains={sortedDomains}
         selectedTags={selectedTags}
         selectedDomain={selectedDomain}
         onTagSelect={handleTagSelect}
@@ -74,7 +81,7 @@ export function BookmarkManager() {
       <div className='flex flex-col flex-1 overflow-hidden'>
         <BookmarkHeader searchQuery={searchQuery} onSearchChange={handleSearchChange} />
         <BookmarkList
-          bookmarks={filteredBookmarks}
+          bookmarks={sortedBookmarks}
           viewType={viewType}
           selectedTags={selectedTags}
           onTagSelect={handleTagSelect}
