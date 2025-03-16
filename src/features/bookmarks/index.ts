@@ -1,1 +1,1 @@
-export { BookmarkManager } from './components/bookmark-manager';
+export { BookmarkContainer } from './components/bookmark-container';

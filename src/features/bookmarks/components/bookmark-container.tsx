@@ -1,23 +1,29 @@
-import { useState } from 'react';
 import { Sidebar } from './sidebar';
 import { BookmarkHeader } from './bookmark-header';
 import { BookmarkList } from './bookmark-list';
-import type { ViewType } from '@/lib/Bookmark';
-import { useAppSelector } from '@/store';
-import { selectors } from '@/store/slices/bookmarks-slice';
+import { useAppDispatch, useAppSelector } from '@/store';
+import { selectors as bookmarkSelectors } from '@/store/slices/bookmarks-slice';
+import {
+  selectors as managerSelectors,
+  actions as managerActions,
+} from '@/store/slices/bookmark-manager-slice';
 import { SettingsModal } from '@/features/settings';
+import type { ViewType } from '@/lib/Bookmark';
 
-export function BookmarkManager() {
-  const [viewType, setViewType] = useState<ViewType>('domain');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+export function BookmarkContainer() {
+  const dispatch = useAppDispatch();
+
+  // Get state from Redux store
+  const viewType = useAppSelector(managerSelectors.selectViewType);
+  const searchQuery = useAppSelector(managerSelectors.selectSearchQuery);
+  const selectedTags = useAppSelector(managerSelectors.selectSelectedTags);
+  const selectedDomain = useAppSelector(managerSelectors.selectSelectedDomain);
+  const isSettingsOpen = useAppSelector(managerSelectors.selectIsSettingsOpen);
 
   // Get bookmarks from Redux store
-  const bookmarks = useAppSelector(selectors.selectAllBookmarks);
-  const allTags = useAppSelector(selectors.selectAllTags);
-  const domains = useAppSelector(selectors.selectAllDomains);
+  const bookmarks = useAppSelector(bookmarkSelectors.selectAllBookmarks);
+  const allTags = useAppSelector(bookmarkSelectors.selectAllTags);
+  const domains = useAppSelector(bookmarkSelectors.selectAllDomains);
 
   // Sort tags and domains alphabetically
   const sortedTags = [...allTags].sort((a, b) => a.name.localeCompare(b.name));
@@ -49,30 +55,21 @@ export function BookmarkManager() {
   const sortedBookmarks = [...filteredBookmarks].sort((a, b) => a.domain.localeCompare(b.domain));
 
   const handleSearchChange = (query: string) => {
-    setSearchQuery(query);
+    dispatch(managerActions.setSearchQuery(query));
   };
 
   const handleViewChange = (view: ViewType) => {
-    setViewType(view);
-    // Reset selections when changing views
-    if (view === 'domain') {
-      setSelectedTags([]);
-    } else {
-      setSelectedDomain(null);
-    }
+    dispatch(managerActions.setViewType(view));
   };
 
   const handleTagSelect = (tag: string) => {
     // Find the tag ID from the tag name if it's a name
     const tagId = allTags.find((t) => t.name === tag)?.id || tag;
-
-    setSelectedTags((prev) =>
-      prev.includes(tagId) ? prev.filter((t) => t !== tagId) : [...prev, tagId]
-    );
+    dispatch(managerActions.toggleTag(tagId));
   };
 
   const handleDomainSelect = (domain: string) => {
-    setSelectedDomain((prev) => (prev === domain ? null : domain));
+    dispatch(managerActions.toggleDomain(domain));
   };
 
   return (
@@ -98,7 +95,10 @@ export function BookmarkManager() {
       </div>
 
       {/* Settings Modal */}
-      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => dispatch(managerActions.setSettingsModalOpen(false))}
+      />
     </div>
   );
 }

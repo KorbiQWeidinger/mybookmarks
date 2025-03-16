@@ -1,9 +1,9 @@
-import { BookmarkManager } from '@/features/bookmarks/components/bookmark-manager';
+import { BookmarkContainer } from '@/features/bookmarks';
 
 export function BookmarksPage() {
   return (
     <main className='min-h-screen bg-background'>
-      <BookmarkManager />
+      <BookmarkContainer />
     </main>
   );
 }
