@@ -66,7 +66,7 @@ export function BookmarkList({
                         }}
                       />
                     )}
-                    {groupName} ({bookmarks.length})
+                    {groupName}
                   </h2>
                 )}
                 <BookmarkTable

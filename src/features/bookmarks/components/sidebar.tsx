@@ -7,6 +7,19 @@ import { Input } from '@/components/ui/input';
 import type { ViewType, Tag } from '@/lib/types';
 import { Bookmark, FolderKanban, Hash, Menu, Search, X, Settings } from 'lucide-react';
 import { SettingsModal } from '@/features/settings';
+import { RemovableTag } from './removable-tag';
+import { useAppDispatch } from '@/store';
+import { actions } from '@/store/slices/bookmarks-slice';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface SidebarProps {
   viewType: ViewType;
@@ -114,11 +127,25 @@ interface TagListProps {
 
 function TagList({ tags, selectedTags, onTagSelect }: TagListProps) {
   const [searchValue, setSearchValue] = useState('');
+  const [tagToDelete, setTagToDelete] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
 
   // Filter tags based on search
   const filteredTags = tags.filter((tag) =>
     tag.name.toLowerCase().includes(searchValue.toLowerCase())
   );
+
+  const handleRemoveTag = (tag: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setTagToDelete(tag);
+  };
+
+  const confirmDeleteTag = () => {
+    if (tagToDelete) {
+      dispatch(actions.deleteTagFromAllBookmarks(tagToDelete));
+      setTagToDelete(null);
+    }
+  };
 
   return (
     <div className='space-y-2 w-full max-w-full overflow-hidden'>
@@ -129,19 +156,44 @@ function TagList({ tags, selectedTags, onTagSelect }: TagListProps) {
       {filteredTags.length > 0 ? (
         <div className='flex flex-wrap gap-2'>
           {filteredTags.map((tag) => (
-            <Badge
+            <RemovableTag
               key={tag.id}
-              variant={selectedTags.includes(tag.id) ? 'default' : 'outline'}
-              className='cursor-pointer'
-              onClick={() => onTagSelect(tag.id)}
-            >
-              {tag.name} ({tag.count})
-            </Badge>
+              tag={tag.name}
+              count={tag.count}
+              isSelected={selectedTags.includes(tag.id)}
+              onClick={onTagSelect}
+              onRemove={handleRemoveTag}
+              variant='trash'
+            />
           ))}
         </div>
       ) : (
         <EmptyResults message='No tags found' />
       )}
+
+      <AlertDialog
+        open={!!tagToDelete}
+        onOpenChange={(open: boolean) => !open && setTagToDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete tag</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete the tag "{tagToDelete}" from all bookmarks? This
+              action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteTag}
+              className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

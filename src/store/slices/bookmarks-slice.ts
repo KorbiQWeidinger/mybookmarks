@@ -72,6 +72,14 @@ export const { actions, reducer } = createSlice({
         saveBookmarksToStorage(state.bookmarks);
       }
     },
+    deleteTagFromAllBookmarks: (state, action: PayloadAction<string>) => {
+      const tagToDelete = action.payload;
+      state.bookmarks = state.bookmarks.map((bookmark) => ({
+        ...bookmark,
+        tags: bookmark.tags.filter((tag) => tag !== tagToDelete),
+      }));
+      saveBookmarksToStorage(state.bookmarks);
+    },
   },
 });
 

@@ -40,3 +40,7 @@ Use the command
 ```
 git acm "xxx: ... (ai)"
 ```
+
+### Theme
+
+Check the index.css file to understand the theme. For colors always use the theme!

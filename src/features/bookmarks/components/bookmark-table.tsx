@@ -13,6 +13,7 @@ import { ExternalLink, Trash2, X } from 'lucide-react';
 import { useAppDispatch } from '@/store';
 import { actions } from '@/store/slices/bookmarks-slice';
 import { useState } from 'react';
+import { RemovableTag } from './removable-tag';
 
 interface BookmarkTableProps {
   bookmarks: Bookmark[];
@@ -25,9 +26,7 @@ export function BookmarkTable({ bookmarks, selectedTags, onTagSelect }: Bookmark
   const [expandedTags, setExpandedTags] = useState<string[]>([]);
 
   const handleDelete = (id: string) => {
-    if (confirm('Are you sure you want to delete this bookmark?')) {
-      dispatch(actions.deleteBookmark(id));
-    }
+    dispatch(actions.deleteBookmark(id));
   };
 
   const toggleExpandTags = (bookmarkId: string) => {
@@ -93,23 +92,13 @@ export function BookmarkTable({ bookmarks, selectedTags, onTagSelect }: Bookmark
                 <TableCell>
                   <div className='flex flex-wrap gap-1'>
                     {displayTags.map((tag) => (
-                      <Badge
+                      <RemovableTag
                         key={tag}
-                        variant={selectedTags.includes(tag) ? 'default' : 'outline'}
-                        className='cursor-pointer text-xs mb-1 group relative transition-all duration-200 hover:pr-5'
-                        onClick={() => onTagSelect(tag)}
-                      >
-                        <span>{tag}</span>
-                        <button
-                          className='absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity'
-                          onClick={(e) => handleRemoveTag(bookmark.id, tag, e)}
-                          onMouseDown={(e) => e.stopPropagation()}
-                          title='Remove tag'
-                          type='button'
-                        >
-                          <X className='h-3 w-3' />
-                        </button>
-                      </Badge>
+                        tag={tag}
+                        isSelected={selectedTags.includes(tag)}
+                        onClick={onTagSelect}
+                        onRemove={(tagToRemove, e) => handleRemoveTag(bookmark.id, tagToRemove, e)}
+                      />
                     ))}
                     {!isExpanded && hiddenTagsCount > 0 && (
                       <Badge
