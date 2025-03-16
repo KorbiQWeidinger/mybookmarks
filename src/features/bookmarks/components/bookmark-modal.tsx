@@ -1,6 +1,6 @@
 import type React from 'react';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -15,24 +15,52 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { X, Plus } from 'lucide-react';
-import { useAppDispatch } from '@/store';
-import { actions } from '@/store/slices/bookmarks-slice';
+import { useAppDispatch, useAppSelector } from '@/store';
+import { actions, selectors } from '@/store/slices/bookmarks-slice';
 
 interface BookmarkModalProps {
   isOpen: boolean;
   onClose: () => void;
+  bookmarkId?: string; // Optional ID for editing existing bookmark
 }
 
-export function BookmarkModal({ isOpen, onClose }: BookmarkModalProps) {
+export function BookmarkModal({ isOpen, onClose, bookmarkId }: BookmarkModalProps) {
   const dispatch = useAppDispatch();
+  const existingBookmark = useAppSelector((state) =>
+    bookmarkId ? selectors.selectBookmarkById(state, bookmarkId) : undefined
+  );
+
   const [formData, setFormData] = useState({
     title: '',
     url: '',
     description: '',
+    favicon: '',
   });
 
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState<string[]>([]);
+
+  // Load existing bookmark data when editing
+  useEffect(() => {
+    if (existingBookmark) {
+      setFormData({
+        title: existingBookmark.title,
+        url: existingBookmark.url,
+        description: existingBookmark.description || '',
+        favicon: existingBookmark.favicon || '',
+      });
+      setTags(existingBookmark.tags || []);
+    } else {
+      // Reset form when creating a new bookmark
+      setFormData({
+        title: '',
+        url: '',
+        description: '',
+        favicon: '',
+      });
+      setTags([]);
+    }
+  }, [existingBookmark, isOpen]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -71,21 +99,39 @@ export function BookmarkModal({ isOpen, onClose }: BookmarkModalProps) {
       domain = formData.url;
     }
 
-    // Create new bookmark
-    dispatch(
-      actions.addBookmark({
-        title: formData.title,
-        url: formData.url,
-        description: formData.description,
-        domain,
-        tags,
-        createdAt: new Date(),
-        favicon: `https://${domain}/favicon.ico`,
-      })
-    );
+    // Generate default favicon URL if none provided
+    const favicon = formData.favicon || `https://${domain}/favicon.ico`;
+
+    if (existingBookmark) {
+      // Update existing bookmark
+      dispatch(
+        actions.updateBookmark({
+          ...existingBookmark,
+          title: formData.title,
+          url: formData.url,
+          description: formData.description,
+          domain,
+          tags,
+          favicon,
+        })
+      );
+    } else {
+      // Create new bookmark
+      dispatch(
+        actions.addBookmark({
+          title: formData.title,
+          url: formData.url,
+          description: formData.description,
+          domain,
+          tags,
+          createdAt: new Date(),
+          favicon,
+        })
+      );
+    }
 
     // Reset form and close modal
-    setFormData({ title: '', url: '', description: '' });
+    setFormData({ title: '', url: '', description: '', favicon: '' });
     setTags([]);
     onClose();
   };
@@ -95,9 +141,11 @@ export function BookmarkModal({ isOpen, onClose }: BookmarkModalProps) {
       <DialogContent className='sm:max-w-[500px]'>
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Add Bookmark</DialogTitle>
+            <DialogTitle>{existingBookmark ? 'Edit Bookmark' : 'Add Bookmark'}</DialogTitle>
             <DialogDescription>
-              Enter the details of the bookmark you want to save.
+              {existingBookmark
+                ? 'Update the details of your bookmark.'
+                : 'Enter the details of the bookmark you want to save.'}
             </DialogDescription>
           </DialogHeader>
 
@@ -137,6 +185,21 @@ export function BookmarkModal({ isOpen, onClose }: BookmarkModalProps) {
                 onChange={handleInputChange}
                 rows={3}
               />
+            </div>
+
+            <div className='grid gap-2'>
+              <Label htmlFor='favicon'>Custom Favicon URL</Label>
+              <Input
+                id='favicon'
+                name='favicon'
+                type='url'
+                placeholder='https://example.com/favicon.ico (optional)'
+                value={formData.favicon}
+                onChange={handleInputChange}
+              />
+              <p className='text-xs text-muted-foreground'>
+                Leave empty to use the default favicon from the website
+              </p>
             </div>
 
             <div className='grid gap-2'>
@@ -181,7 +244,7 @@ export function BookmarkModal({ isOpen, onClose }: BookmarkModalProps) {
             <Button type='button' variant='outline' onClick={onClose}>
               Cancel
             </Button>
-            <Button type='submit'>Save Bookmark</Button>
+            <Button type='submit'>{existingBookmark ? 'Update' : 'Save'} Bookmark</Button>
           </DialogFooter>
         </form>
       </DialogContent>

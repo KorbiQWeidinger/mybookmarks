@@ -8,12 +8,19 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import type { Bookmark } from '@/lib/Bookmark';
-import { ExternalLink, Trash2 } from 'lucide-react';
+import { ExternalLink, Trash2, MoreHorizontal, Pencil } from 'lucide-react';
 import { useAppDispatch } from '@/store';
 import { actions } from '@/store/slices/bookmarks-slice';
 import { useState } from 'react';
 import { BookmarkTag } from './bookmark-tag';
+import { BookmarkModal } from './bookmark-modal';
 
 interface BookmarkTableProps {
   bookmarks: Bookmark[];
@@ -24,6 +31,7 @@ interface BookmarkTableProps {
 export function BookmarkTable({ bookmarks, selectedTags, onTagSelect }: BookmarkTableProps) {
   const dispatch = useAppDispatch();
   const [expandedTags, setExpandedTags] = useState<string[]>([]);
+  const [editingBookmarkId, setEditingBookmarkId] = useState<string | null>(null);
 
   const handleDelete = (id: string) => {
     dispatch(actions.deleteBookmark(id));
@@ -41,6 +49,14 @@ export function BookmarkTable({ bookmarks, selectedTags, onTagSelect }: Bookmark
     dispatch(actions.removeTagFromBookmark({ bookmarkId, tag: tagToRemove }));
   };
 
+  const handleEdit = (bookmarkId: string) => {
+    setEditingBookmarkId(bookmarkId);
+  };
+
+  const handleCloseEditModal = () => {
+    setEditingBookmarkId(null);
+  };
+
   return (
     <div className='w-full overflow-auto'>
       <Table>
@@ -49,7 +65,7 @@ export function BookmarkTable({ bookmarks, selectedTags, onTagSelect }: Bookmark
             <TableHead className='w-[300px]'>Title</TableHead>
             <TableHead className='hidden md:table-cell'>Description</TableHead>
             <TableHead className='w-[600px]'>Tags</TableHead>
-            <TableHead className='w-[50px]'></TableHead>
+            <TableHead className='w-[100px]'></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -125,22 +141,48 @@ export function BookmarkTable({ bookmarks, selectedTags, onTagSelect }: Bookmark
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Button
-                    variant='ghost'
-                    size='icon'
-                    className='h-8 w-8 text-muted-foreground hover:text-destructive'
-                    onClick={() => handleDelete(bookmark.id)}
-                    title='Delete bookmark'
-                  >
-                    <Trash2 className='h-4 w-4' />
-                    <span className='sr-only'>Delete</span>
-                  </Button>
+                  <div className='flex items-center justify-end gap-1'>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant='ghost'
+                          size='icon'
+                          className='h-8 w-8 text-muted-foreground'
+                        >
+                          <MoreHorizontal className='h-4 w-4' />
+                          <span className='sr-only'>Open menu</span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align='end'>
+                        <DropdownMenuItem onClick={() => handleEdit(bookmark.id)}>
+                          <Pencil className='h-4 w-4 mr-2' />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleDelete(bookmark.id)}
+                          className='text-destructive focus:text-destructive'
+                        >
+                          <Trash2 className='h-4 w-4 mr-2' />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </TableCell>
               </TableRow>
             );
           })}
         </TableBody>
       </Table>
+
+      {/* Edit Modal */}
+      {editingBookmarkId && (
+        <BookmarkModal
+          isOpen={!!editingBookmarkId}
+          onClose={handleCloseEditModal}
+          bookmarkId={editingBookmarkId}
+        />
+      )}
     </div>
   );
 }

@@ -178,8 +178,8 @@ export function BookmarkTag({
             variant='ghost'
             size='icon-sm'
             className={cn(
-              'p-0 h-3 w-3 hover:bg-muted/60 rounded-sm',
-              'hover:text-muted-foreground'
+              'p-0 h-3 pl-3 pr-2 w-3 hover:bg-muted/60 rounded-sm',
+              'hover:text-muted-foreground hover:bg-none'
             )}
             onClick={handleEdit}
             onMouseDown={(e) => e.stopPropagation()}
@@ -192,7 +192,7 @@ export function BookmarkTag({
             variant='ghost'
             size='icon-sm'
             className={cn(
-              'p-0 px-1 h-3 w-3 hover:bg-muted/60 rounded-sm ml-1',
+              'p-0 px-1 h-3 w-3 hover:bg-muted/60 rounded-sm ml-1 hover:bg-none',
               variant === 'trash' ? 'hover:text-destructive' : 'hover:text-muted-foreground'
             )}
             onClick={handleRemove}
