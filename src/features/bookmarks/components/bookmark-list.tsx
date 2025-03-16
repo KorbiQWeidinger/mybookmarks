@@ -4,7 +4,7 @@ import { BookmarkTable } from './bookmark-table';
 import { Button } from '@/components/ui/button';
 import { Import } from 'lucide-react';
 import { BookmarkImportModal } from './bookmark-import-modal';
-import type { Bookmark, ViewType } from '@/lib/types';
+import type { Bookmark, ViewType } from '@/lib/Bookmark';
 
 interface BookmarkListProps {
   bookmarks: Bookmark[];

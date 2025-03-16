@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Sidebar } from './sidebar';
 import { BookmarkHeader } from './bookmark-header';
 import { BookmarkList } from './bookmark-list';
-import type { ViewType } from '@/lib/types';
+import type { ViewType } from '@/lib/Bookmark';
 import { useAppSelector } from '@/store';
 import { selectors } from '@/store/slices/bookmarks-slice';
 import { SettingsModal } from '@/features/settings';

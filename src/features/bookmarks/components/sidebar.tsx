@@ -4,7 +4,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import type { ViewType, Tag } from '@/lib/types';
+import type { ViewType, Tag } from '@/lib/Bookmark';
 import { Bookmark, FolderKanban, Hash, Menu, Search, X, Settings } from 'lucide-react';
 import { SettingsModal } from '@/features/settings';
 import { RemovableTag } from './removable-tag';

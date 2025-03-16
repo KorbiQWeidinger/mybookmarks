@@ -93,14 +93,16 @@ export function BookmarkImportModal({ isOpen, onClose }: BookmarkImportModalProp
         });
       } else {
         // Add each bookmark to the store
+        let importedCount = 0;
         bookmarks.forEach((bookmark) => {
           dispatch(actions.addBookmark(bookmark));
+          importedCount++;
         });
 
         setImportResult({
           success: true,
-          message: 'Bookmarks imported successfully!',
-          count: bookmarks.length,
+          message: `${importedCount} bookmarks imported successfully!`,
+          count: importedCount,
         });
 
         // Reset file after successful import

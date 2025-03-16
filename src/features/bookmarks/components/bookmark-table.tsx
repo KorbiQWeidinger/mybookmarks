@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import type { Bookmark } from '@/lib/types';
+import type { Bookmark } from '@/lib/Bookmark';
 import { ExternalLink, Trash2 } from 'lucide-react';
 import { useAppDispatch } from '@/store';
 import { actions } from '@/store/slices/bookmarks-slice';
@@ -59,7 +59,7 @@ export function BookmarkTable({ bookmarks, selectedTags, onTagSelect }: Bookmark
             const hiddenTagsCount = bookmark.tags.length - 4;
 
             return (
-              <TableRow key={bookmark.id}>
+              <TableRow key={bookmark.url}>
                 <TableCell className='font-medium'>
                   <div className='flex items-start gap-2'>
                     {bookmark.favicon && (
