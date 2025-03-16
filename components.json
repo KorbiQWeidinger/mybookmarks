@@ -20,7 +20,8 @@
     "logos": "@/components/logos",
     "routes": "@/routes",
     "pages": "@/pages",
-    "app": "@/app"
+    "app": "@/app",
+    "bookmarks": "@/features/bookmarks"
   },
   "iconLibrary": "lucide"
 }

@@ -25,6 +25,9 @@ Do not use default exports!
 
 ## Installing ui components
 
+Before installing a component check which components are already available in `/components/ui`
+If we do not have a ui component installed it can be installed with
+
 ```
 npx shadcn@latest add XXX
 ```
