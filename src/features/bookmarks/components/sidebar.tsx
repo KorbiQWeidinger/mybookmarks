@@ -7,7 +7,10 @@ import { Input } from '@/components/ui/input';
 import type { ViewType, Tag } from '@/lib/Bookmark';
 import { Bookmark, FolderKanban, Hash, Menu, Search, X, Settings } from 'lucide-react';
 import { SettingsModal } from '@/features/settings';
+import { useAppSelector } from '@/store';
+import { selectors } from '@/store/slices/bookmarks-slice';
 import { BookmarkTag } from './bookmark-tag';
+
 interface SidebarProps {
   viewType: ViewType;
   onViewChange: (view: ViewType) => void;
@@ -114,11 +117,32 @@ interface TagListProps {
 
 function TagList({ tags, selectedTags, onTagSelect }: TagListProps) {
   const [searchValue, setSearchValue] = useState('');
+  const bookmarks = useAppSelector(selectors.selectAllBookmarks);
 
   // Filter tags based on search
   const filteredTags = tags.filter((tag) =>
     tag.name.toLowerCase().includes(searchValue.toLowerCase())
   );
+
+  // Filter out tags that don't have possible combinations with the currently selected tags
+  const availableTags =
+    selectedTags.length > 0
+      ? filteredTags.filter((tag) => {
+          // Skip if the tag is already selected
+          if (selectedTags.includes(tag.id)) return true;
+
+          // Check if there's at least one bookmark that has all selected tags AND this tag
+          return bookmarks.some((bookmark) => {
+            const hasAllSelectedTags = selectedTags.every((selectedTagId) => {
+              const selectedTagName = tags.find((t) => t.id === selectedTagId)?.name;
+              return selectedTagName ? bookmark.tags.includes(selectedTagName) : false;
+            });
+
+            // If the bookmark has all selected tags, check if it also has the current tag
+            return hasAllSelectedTags && bookmark.tags.includes(tag.name);
+          });
+        })
+      : filteredTags;
 
   return (
     <div className='space-y-2 w-full max-w-full overflow-hidden'>
@@ -126,9 +150,9 @@ function TagList({ tags, selectedTags, onTagSelect }: TagListProps) {
 
       <SectionTitle title='Tags' />
 
-      {filteredTags.length > 0 ? (
+      {availableTags.length > 0 ? (
         <div className='flex flex-col space-y-2'>
-          {filteredTags.map((tag) => (
+          {availableTags.map((tag) => (
             <BookmarkTag
               key={tag.id}
               tag={tag.name}
