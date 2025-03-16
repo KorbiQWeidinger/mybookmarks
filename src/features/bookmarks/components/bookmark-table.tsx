@@ -64,13 +64,16 @@ export function BookmarkTable({ bookmarks, selectedTags, onTagSelect }: Bookmark
                   <div className='flex items-start gap-2'>
                     {bookmark.favicon && (
                       <img
-                        src={bookmark.favicon || '/placeholder.svg'}
+                        src={bookmark.favicon || ''}
                         alt=''
                         className='w-4 h-4 mt-1'
                         onError={(e) => {
                           (e.target as HTMLImageElement).style.display = 'none';
                         }}
                       />
+                    )}
+                    {bookmark.favicon === null && (
+                      <div className='w-4 h-4 mt-1 bg-muted rounded-full' />
                     )}
                     <div>
                       <a

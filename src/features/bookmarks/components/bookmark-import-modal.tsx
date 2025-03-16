@@ -13,6 +13,7 @@ import { actions } from '@/store/slices/bookmarks-slice';
 import { Upload, FileUp, Check, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
+import { parseBookmarksFromHtml, isValidBookmarkFile } from '@/features/bookmarks/utils';
 
 interface BookmarkImportModalProps {
   isOpen: boolean;
@@ -47,7 +48,7 @@ export function BookmarkImportModal({ isOpen, onClose }: BookmarkImportModalProp
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const droppedFile = e.dataTransfer.files[0];
-      if (droppedFile.type === 'text/html' || droppedFile.name.endsWith('.html')) {
+      if (isValidBookmarkFile(droppedFile)) {
         setFile(droppedFile);
         setImportResult(null);
       } else {
@@ -62,7 +63,7 @@ export function BookmarkImportModal({ isOpen, onClose }: BookmarkImportModalProp
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const selectedFile = e.target.files[0];
-      if (selectedFile.type === 'text/html' || selectedFile.name.endsWith('.html')) {
+      if (isValidBookmarkFile(selectedFile)) {
         setFile(selectedFile);
         setImportResult(null);
       } else {
@@ -74,69 +75,6 @@ export function BookmarkImportModal({ isOpen, onClose }: BookmarkImportModalProp
     }
   };
 
-  const parseBookmarksFromHtml = (html: string) => {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-
-    // Find all bookmark links
-    const links = doc.querySelectorAll('a');
-    const bookmarks = [];
-    const totalLinks = links.length;
-
-    // Process each link
-    for (let i = 0; i < totalLinks; i++) {
-      const link = links[i];
-      const url = link.getAttribute('href');
-      const title = link.textContent?.trim() || '';
-
-      if (url && title && url.startsWith('http')) {
-        try {
-          const urlObj = new URL(url);
-          const domain = urlObj.hostname.replace('www.', '');
-
-          // Extract folder structure as tags
-          const tags: string[] = [];
-
-          // Find parent folders (DL > DT > H3 elements)
-          let currentElement = link.parentElement;
-          while (currentElement) {
-            // Look for H3 elements which are folder names in Chrome bookmarks
-            const folderName = currentElement.querySelector('h3')?.textContent?.trim();
-            if (folderName && folderName !== 'Bookmarks' && folderName !== 'Bookmarks bar') {
-              tags.push(folderName.toLowerCase().replace(/\s+/g, '-'));
-            }
-
-            // Move up to parent DL element
-            currentElement = currentElement.parentElement;
-          }
-
-          // Add domain as a tag
-          tags.push(domain.split('.')[0]);
-
-          // Remove duplicates
-          const uniqueTags = [...new Set(tags)];
-
-          bookmarks.push({
-            title,
-            url,
-            description: '',
-            domain,
-            tags: uniqueTags,
-            createdAt: new Date(),
-            favicon: `https://${domain}/favicon.ico`,
-          });
-        } catch (error) {
-          console.error('Invalid URL:', url, error);
-        }
-      }
-
-      // Update progress
-      setProgress(Math.round(((i + 1) / totalLinks) * 100));
-    }
-
-    return bookmarks;
-  };
-
   const handleImport = async () => {
     if (!file) return;
 
@@ -146,7 +84,7 @@ export function BookmarkImportModal({ isOpen, onClose }: BookmarkImportModalProp
 
     try {
       const text = await file.text();
-      const bookmarks = parseBookmarksFromHtml(text);
+      const bookmarks = parseBookmarksFromHtml(text, setProgress);
 
       if (bookmarks.length === 0) {
         setImportResult({
