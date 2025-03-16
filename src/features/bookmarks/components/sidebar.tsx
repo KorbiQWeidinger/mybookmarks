@@ -19,6 +19,133 @@ interface SidebarProps {
   onOpenSettings: () => void;
 }
 
+// Reusable search input component
+interface SearchInputProps {
+  placeholder: string;
+  value: string;
+  onChange: (value: string) => void;
+}
+
+function SearchInput({ placeholder, value, onChange }: SearchInputProps) {
+  return (
+    <div className='relative mb-4'>
+      <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
+      <Input
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className='pl-8 h-9 w-full'
+      />
+      {value && (
+        <Button
+          variant='ghost'
+          size='icon'
+          className='absolute right-1 top-1 h-7 w-7'
+          onClick={() => onChange('')}
+        >
+          <X className='h-4 w-4' />
+          <span className='sr-only'>Clear search</span>
+        </Button>
+      )}
+    </div>
+  );
+}
+
+// Section title component
+function SectionTitle({ title }: { title: string }) {
+  return <h2 className='text-sm font-semibold text-muted-foreground mb-2'>{title}</h2>;
+}
+
+// Empty results component
+function EmptyResults({ message }: { message: string }) {
+  return <p className='text-sm text-muted-foreground text-center py-2'>{message}</p>;
+}
+
+// Domain list component
+interface DomainListProps {
+  domains: { name: string; count: number }[];
+  selectedDomain: string | null;
+  onDomainSelect: (domain: string) => void;
+}
+
+function DomainList({ domains, selectedDomain, onDomainSelect }: DomainListProps) {
+  const [searchValue, setSearchValue] = useState('');
+
+  // Filter domains based on search
+  const filteredDomains = domains.filter((domain) =>
+    domain.name.toLowerCase().includes(searchValue.toLowerCase())
+  );
+
+  return (
+    <div className='space-y-2 w-full max-w-full overflow-hidden'>
+      <SearchInput placeholder='Search domains...' value={searchValue} onChange={setSearchValue} />
+
+      <SectionTitle title='Domains' />
+
+      {filteredDomains.length > 0 ? (
+        filteredDomains.map((domain) => (
+          <Button
+            key={domain.name}
+            variant={selectedDomain === domain.name ? 'secondary' : 'ghost'}
+            className='w-full justify-start text-left overflow-hidden min-w-0'
+            onClick={() => onDomainSelect(domain.name)}
+          >
+            <div className='flex items-center w-full min-w-0'>
+              <span className='truncate min-w-0 flex-1'>{domain.name}</span>
+              <Badge variant='outline' className='ml-2 flex-shrink-0'>
+                {domain.count}
+              </Badge>
+            </div>
+          </Button>
+        ))
+      ) : (
+        <EmptyResults message='No domains found' />
+      )}
+    </div>
+  );
+}
+
+// Tag list component
+interface TagListProps {
+  tags: Tag[];
+  selectedTags: string[];
+  onTagSelect: (tag: string) => void;
+}
+
+function TagList({ tags, selectedTags, onTagSelect }: TagListProps) {
+  const [searchValue, setSearchValue] = useState('');
+
+  // Filter tags based on search
+  const filteredTags = tags.filter((tag) =>
+    tag.name.toLowerCase().includes(searchValue.toLowerCase())
+  );
+
+  return (
+    <div className='space-y-2 w-full max-w-full overflow-hidden'>
+      <SearchInput placeholder='Search tags...' value={searchValue} onChange={setSearchValue} />
+
+      <SectionTitle title='Tags' />
+
+      {filteredTags.length > 0 ? (
+        <div className='flex flex-wrap gap-2'>
+          {filteredTags.map((tag) => (
+            <Badge
+              key={tag.id}
+              variant={selectedTags.includes(tag.id) ? 'default' : 'outline'}
+              className='cursor-pointer'
+              onClick={() => onTagSelect(tag.id)}
+            >
+              {tag.name} ({tag.count})
+            </Badge>
+          ))}
+        </div>
+      ) : (
+        <EmptyResults message='No tags found' />
+      )}
+    </div>
+  );
+}
+
 export function Sidebar({
   viewType,
   onViewChange,
@@ -31,18 +158,6 @@ export function Sidebar({
   onOpenSettings,
 }: SidebarProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [domainSearch, setDomainSearch] = useState('');
-  const [tagSearch, setTagSearch] = useState('');
-
-  // Filter domains based on search
-  const filteredDomains = domains.filter((domain) =>
-    domain.name.toLowerCase().includes(domainSearch.toLowerCase())
-  );
-
-  // Filter tags based on search
-  const filteredTags = tags.filter((tag) =>
-    tag.name.toLowerCase().includes(tagSearch.toLowerCase())
-  );
 
   return (
     <>
@@ -62,7 +177,7 @@ export function Sidebar({
           isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         } fixed md:relative z-40`}
       >
-        <div className='p-4 border-b'>
+        <div className='p-5 border-b'>
           <h1 className='text-xl font-bold flex items-center gap-2'>
             <Bookmark className='h-5 w-5' />
             Bookmarks
@@ -90,92 +205,21 @@ export function Sidebar({
         </div>
 
         <div className='flex-1 overflow-hidden'>
-          <ScrollArea className='h-full px-4 py-4'>
+          <ScrollArea className='h-full w-full px-4 py-4'>
+            <style>{`
+              [data-radix-scroll-area-viewport] > div {
+                display: block !important;
+                min-width: 0 !important;
+              }
+            `}</style>
             {viewType === 'domain' ? (
-              <div className='space-y-2'>
-                <div className='relative mb-4'>
-                  <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
-                  <Input
-                    placeholder='Search domains...'
-                    value={domainSearch}
-                    onChange={(e) => setDomainSearch(e.target.value)}
-                    className='pl-8 h-9'
-                  />
-                  {domainSearch && (
-                    <Button
-                      variant='ghost'
-                      size='icon'
-                      className='absolute right-1 top-1 h-7 w-7'
-                      onClick={() => setDomainSearch('')}
-                    >
-                      <X className='h-4 w-4' />
-                      <span className='sr-only'>Clear search</span>
-                    </Button>
-                  )}
-                </div>
-
-                <h2 className='text-sm font-semibold text-muted-foreground mb-2'>Domains</h2>
-
-                {filteredDomains.length > 0 ? (
-                  filteredDomains.map((domain) => (
-                    <Button
-                      key={domain.name}
-                      variant={selectedDomain === domain.name ? 'secondary' : 'ghost'}
-                      className='w-full justify-start text-left'
-                      onClick={() => onDomainSelect(domain.name)}
-                    >
-                      <span className='truncate flex-1'>{domain.name}</span>
-                      <Badge variant='outline' className='ml-2'>
-                        {domain.count}
-                      </Badge>
-                    </Button>
-                  ))
-                ) : (
-                  <p className='text-sm text-muted-foreground text-center py-2'>No domains found</p>
-                )}
-              </div>
+              <DomainList
+                domains={domains}
+                selectedDomain={selectedDomain}
+                onDomainSelect={onDomainSelect}
+              />
             ) : (
-              <div className='space-y-2'>
-                <div className='relative mb-4'>
-                  <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
-                  <Input
-                    placeholder='Search tags...'
-                    value={tagSearch}
-                    onChange={(e) => setTagSearch(e.target.value)}
-                    className='pl-8 h-9'
-                  />
-                  {tagSearch && (
-                    <Button
-                      variant='ghost'
-                      size='icon'
-                      className='absolute right-1 top-1 h-7 w-7'
-                      onClick={() => setTagSearch('')}
-                    >
-                      <X className='h-4 w-4' />
-                      <span className='sr-only'>Clear search</span>
-                    </Button>
-                  )}
-                </div>
-
-                <h2 className='text-sm font-semibold text-muted-foreground mb-2'>Tags</h2>
-
-                {filteredTags.length > 0 ? (
-                  <div className='flex flex-wrap gap-2'>
-                    {filteredTags.map((tag) => (
-                      <Badge
-                        key={tag.id}
-                        variant={selectedTags.includes(tag.id) ? 'default' : 'outline'}
-                        className='cursor-pointer'
-                        onClick={() => onTagSelect(tag.id)}
-                      >
-                        {tag.name} ({tag.count})
-                      </Badge>
-                    ))}
-                  </div>
-                ) : (
-                  <p className='text-sm text-muted-foreground text-center py-2'>No tags found</p>
-                )}
-              </div>
+              <TagList tags={tags} selectedTags={selectedTags} onTagSelect={onTagSelect} />
             )}
           </ScrollArea>
         </div>

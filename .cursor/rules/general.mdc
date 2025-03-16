@@ -31,3 +31,12 @@ If we do not have a ui component installed it can be installed with
 ```
 npx shadcn@latest add XXX
 ```
+
+## Commiting changes
+
+Use conventional commits. Append the commit message with (ai) to signal that the changes where ai generated.
+Use the command
+
+```
+git acm "xxx: ... (ai)"
+```
