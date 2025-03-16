@@ -32,7 +32,13 @@ export function BookmarkManager() {
       : true;
 
     const matchesTags =
-      selectedTags.length > 0 ? selectedTags.every((tag) => bookmark.tags.includes(tag)) : true;
+      selectedTags.length > 0
+        ? selectedTags.every((tagId) => {
+            // Find the tag name from the ID
+            const tagName = allTags.find((t) => t.id === tagId)?.name;
+            return tagName ? bookmark.tags.includes(tagName) : false;
+          })
+        : true;
 
     const matchesDomain = selectedDomain ? bookmark.domain === selectedDomain : true;
 
@@ -57,8 +63,11 @@ export function BookmarkManager() {
   };
 
   const handleTagSelect = (tag: string) => {
+    // Find the tag ID from the tag name if it's a name
+    const tagId = allTags.find((t) => t.name === tag)?.id || tag;
+
     setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+      prev.includes(tagId) ? prev.filter((t) => t !== tagId) : [...prev, tagId]
     );
   };
 

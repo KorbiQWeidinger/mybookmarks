@@ -115,7 +115,6 @@ interface TagListProps {
 
 function TagList({ tags, selectedTags, onTagSelect }: TagListProps) {
   const [searchValue, setSearchValue] = useState('');
-  const dispatch = useAppDispatch();
 
   // Filter tags based on search
   const filteredTags = tags.filter((tag) =>
@@ -136,7 +135,7 @@ function TagList({ tags, selectedTags, onTagSelect }: TagListProps) {
               tag={tag.name}
               count={tag.count}
               isSelected={selectedTags.includes(tag.id)}
-              onClick={onTagSelect}
+              onClick={() => onTagSelect(tag.name)}
               variant='trash'
               allTags={tags}
               className='inline-flex'
