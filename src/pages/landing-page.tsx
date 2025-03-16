@@ -1,6 +1,16 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import {
+  ArrowRight,
+  Moon,
+  Search,
+  Sparkles,
+  Tags,
+  Smartphone,
+  Globe,
+  Cloud,
+  BarChart2,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export function LandingPage() {
@@ -59,43 +69,42 @@ export function LandingPage() {
       <section className='space-y-4 text-center'>
         <h2 className='text-2xl font-semibold'>Features</h2>
         <ul className='text-muted-foreground space-y-2'>
-          <li>✨ Clean and minimalist bookmark management</li>
-          <li>🏷️ Custom tags and categories</li>
-          <li>🔍 Quick search and filtering</li>
-          <li>🌙 Dark mode support</li>
+          <li className='flex items-center justify-center gap-2'>
+            <Sparkles className='h-4 w-4' /> Clean and minimalist bookmark management
+          </li>
+          <li className='flex items-center justify-center gap-2'>
+            <Tags className='h-4 w-4' /> Custom tags and categories
+          </li>
+          <li className='flex items-center justify-center gap-2'>
+            <Search className='h-4 w-4' /> Quick search and filtering
+          </li>
+          <li className='flex items-center justify-center gap-2'>
+            <Moon className='h-4 w-4' /> Dark mode support
+          </li>
         </ul>
       </section>
 
       <section className='space-y-4 text-center'>
         <h2 className='text-2xl font-semibold'>Roadmap</h2>
         <ul className='text-muted-foreground space-y-2'>
-          <li>📱 Mobile responsive design</li>
-          <li>🔄 Browser extension for quick bookmarking</li>
-          <li>☁️ Cloud sync across devices</li>
-          <li>📊 Advanced bookmark analytics</li>
+          <li className='flex items-center justify-center gap-2'>
+            <Smartphone className='h-4 w-4' /> Mobile responsive design
+          </li>
+          <li className='flex items-center justify-center gap-2'>
+            <Globe className='h-4 w-4' /> Browser extension for quick bookmarking
+          </li>
+          <li className='flex items-center justify-center gap-2'>
+            <Cloud className='h-4 w-4' /> Cloud sync across devices
+          </li>
+          <li className='flex items-center justify-center gap-2'>
+            <BarChart2 className='h-4 w-4' /> Advanced bookmark analytics
+          </li>
         </ul>
       </section>
 
       <section className='space-y-4 text-center'>
         <h2 className='text-2xl font-semibold'>Contact & Contribute</h2>
         <div className='flex flex-col items-center space-y-4'>
-          <div className='flex items-center gap-3'>
-            <div className='w-10 h-10 rounded-full overflow-hidden'>
-              <img
-                src='/mybookmarks/korbi.png'
-                alt='Korbi'
-                className='w-full h-full object-cover'
-              />
-            </div>
-            <a
-              href='https://www.linkedin.com/in/korbinian-weidinger-524b63229/'
-              target='_blank'
-              rel='noopener noreferrer'
-              className='text-primary hover:underline'
-            >
-              Contact me on LinkedIn for bug reports or feature requests
-            </a>
-          </div>
           <div className='flex items-center gap-3'>
             <a
               href='https://github.com/KorbiQWeidinger/mybookmarks'
@@ -119,6 +128,23 @@ export function LandingPage() {
                 <path d='M9 18c-4.51 2-5-2-7-2'></path>
               </svg>
               Create an issue or open a pull request on GitHub
+            </a>
+          </div>
+          <div className='flex items-center gap-3'>
+            <div className='w-10 h-10 rounded-full overflow-hidden'>
+              <img
+                src='/mybookmarks/korbi.png'
+                alt='Korbi'
+                className='w-full h-full object-cover'
+              />
+            </div>
+            <a
+              href='https://www.linkedin.com/in/korbinian-weidinger-524b63229/'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='text-primary hover:underline'
+            >
+              Contact me on LinkedIn
             </a>
           </div>
         </div>

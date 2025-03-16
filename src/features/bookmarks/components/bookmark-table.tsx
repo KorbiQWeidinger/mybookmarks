@@ -9,7 +9,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { Bookmark } from '@/lib/types';
-import { ExternalLink, Trash2, X } from 'lucide-react';
+import { ExternalLink, Trash2 } from 'lucide-react';
 import { useAppDispatch } from '@/store';
 import { actions } from '@/store/slices/bookmarks-slice';
 import { useState } from 'react';
