@@ -45,6 +45,7 @@ export function BookmarkTag({
   const [editValue, setEditValue] = useState(tag);
   const [showMergeDialog, setShowMergeDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [hasDuplicateTag, setHasDuplicateTag] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleRemove = (e: MouseEvent) => {
@@ -75,14 +76,20 @@ export function BookmarkTag({
   };
 
   const saveTagEdit = (newTag: string) => {
-    if (newTag.trim() && newTag !== tag) {
+    // Normalize the tag values for comparison
+    const normalizedNewTag = newTag.trim();
+    const normalizedOriginalTag = tag.trim();
+
+    // Only proceed if the tag actually changed (not just whitespace changes)
+    if (normalizedNewTag && normalizedNewTag !== normalizedOriginalTag) {
       // Check if tag already exists
-      const tagExists = allTags.some((t) => t.name === newTag);
+      const tagExists = allTags.some((t) => t.name === normalizedNewTag);
 
       if (tagExists) {
-        setEditValue(newTag);
+        setEditValue(normalizedNewTag);
+        setHasDuplicateTag(true);
         setShowMergeDialog(true);
-        return;
+        return; // Don't exit editing mode yet
       }
 
       if (bookmarkId) {
@@ -91,13 +98,14 @@ export function BookmarkTag({
         dispatch(actions.removeTagFromBookmark({ bookmarkId, tag }));
 
         // Then add the new tag
-        dispatch(actions.addTagToBookmark({ bookmarkId, tag: newTag.trim() }));
+        dispatch(actions.addTagToBookmark({ bookmarkId, tag: normalizedNewTag }));
       } else {
         // Update tag across all bookmarks
-        dispatch(actions.updateTagInAllBookmarks({ oldTag: tag, newTag }));
+        dispatch(actions.updateTagInAllBookmarks({ oldTag: tag, newTag: normalizedNewTag }));
       }
     }
 
+    setHasDuplicateTag(false);
     setIsEditing(false);
   };
 
@@ -108,10 +116,14 @@ export function BookmarkTag({
   };
 
   const confirmMergeTag = () => {
-    if (editValue.trim() && editValue !== tag) {
-      dispatch(actions.updateTagInAllBookmarks({ oldTag: tag, newTag: editValue.trim() }));
+    const normalizedNewTag = editValue.trim();
+    const normalizedOriginalTag = tag.trim();
+
+    if (normalizedNewTag && normalizedNewTag !== normalizedOriginalTag) {
+      dispatch(actions.updateTagInAllBookmarks({ oldTag: tag, newTag: normalizedNewTag }));
     }
     setShowMergeDialog(false);
+    setHasDuplicateTag(false);
     setIsEditing(false);
   };
 
@@ -121,6 +133,7 @@ export function BookmarkTag({
       saveTagEdit(editValue.trim());
     } else if (e.key === 'Escape') {
       setEditValue(tag);
+      setHasDuplicateTag(false);
       setIsEditing(false);
     }
   };
@@ -140,7 +153,13 @@ export function BookmarkTag({
           value={editValue}
           onChange={(e) => setEditValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          onBlur={() => saveTagEdit(editValue.trim())}
+          onBlur={() => {
+            // Only call saveTagEdit if we're not showing the merge dialog
+            // and we haven't detected a duplicate tag
+            if (!showMergeDialog && !hasDuplicateTag) {
+              saveTagEdit(editValue);
+            }
+          }}
           className='h-6 text-xs py-0 px-2'
           onClick={(e) => e.stopPropagation()}
         />
@@ -173,7 +192,7 @@ export function BookmarkTag({
           {tag}
           {count !== undefined && ` (${count})`}
         </span>
-        <div className='absolute right-1 flex items-center h-full opacity-0 group-hover:opacity-100 transition-opacity'>
+        <div className='absolute right-1 flex items-center h-full opacity-0 group-hover:opacity-100 transition-opacity dark:hover:bg-none'>
           <Button
             variant='ghost'
             size='icon-sm'
@@ -192,7 +211,7 @@ export function BookmarkTag({
             variant='ghost'
             size='icon-sm'
             className={cn(
-              'p-0 px-1 h-3 w-3 hover:bg-muted/60 rounded-sm ml-1 hover:bg-none',
+              'p-0 px-1 h-3 w-3 hover:bg-muted/60 rounded-sm ml-1 hover:bg-none dark:hover:bg-none',
               variant === 'trash' ? 'hover:text-destructive' : 'hover:text-muted-foreground'
             )}
             onClick={handleRemove}
@@ -206,7 +225,18 @@ export function BookmarkTag({
       </Badge>
 
       {/* Merge Tag Dialog */}
-      <AlertDialog open={showMergeDialog} onOpenChange={setShowMergeDialog}>
+      <AlertDialog
+        open={showMergeDialog}
+        onOpenChange={(open) => {
+          setShowMergeDialog(open);
+          if (!open) {
+            // If dialog is closed without confirming, reset to original tag
+            setEditValue(tag);
+            setHasDuplicateTag(false);
+            setIsEditing(false);
+          }
+        }}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Merge tags</AlertDialogTitle>
