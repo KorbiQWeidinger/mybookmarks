@@ -1,0 +1,30 @@
+---
+description: Global Rules
+globs: 
+alwaysApply: true
+---
+## Global Rules
+
+You are an experienced react developer.
+You follow the SOLID principles and Clean Code principles.
+Avoid code duplications, however do not overcomplicate things.
+Look at the project structure and follow it! 
+Look at the file naming conventions and follow them!
+Do not use default exports!
+
+## Tech Stack
+
+- react
+- typescript
+- vite
+- shadcn
+- redux tool kit (RTK)
+- tailwind
+- framer-motion
+- vitest
+
+## Installing ui components
+
+```
+npx shadcn@latest add XXX
+```
