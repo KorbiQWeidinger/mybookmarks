@@ -33,7 +33,8 @@ export const parseBookmarksFromHtml = (html: string, onProgress?: (progress: num
         while (currentElement) {
           // Look for H3 elements which are folder names in Chrome bookmarks
           const folderName = currentElement.querySelector('h3')?.textContent?.trim();
-          if (folderName && folderName !== 'Bookmarks' && folderName !== 'bookmarks-bar') {
+
+          if (folderName) {
             tags.push(folderName.toLowerCase().replace(/\s+/g, '-'));
           }
 
@@ -44,12 +45,17 @@ export const parseBookmarksFromHtml = (html: string, onProgress?: (progress: num
         // Remove duplicates
         const uniqueTags = [...new Set(tags)];
 
+        // Remove some tags that are not useful
+        const filteredTags = uniqueTags.filter(
+          (tag) => !tag.includes('chrome') && !tag.includes('bookmarks')
+        );
+
         bookmarks.push({
           title,
           url,
           description: '',
           domain,
-          tags: uniqueTags,
+          tags: filteredTags,
           createdAt: new Date(),
           favicon: `https://${domain}/favicon.ico`,
         });

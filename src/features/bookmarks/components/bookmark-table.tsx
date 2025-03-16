@@ -13,7 +13,7 @@ import { ExternalLink, Trash2 } from 'lucide-react';
 import { useAppDispatch } from '@/store';
 import { actions } from '@/store/slices/bookmarks-slice';
 import { useState } from 'react';
-import { RemovableTag } from './removable-tag';
+import { BookmarkTag } from './bookmark-tag';
 
 interface BookmarkTableProps {
   bookmarks: Bookmark[];
@@ -95,9 +95,10 @@ export function BookmarkTable({ bookmarks, selectedTags, onTagSelect }: Bookmark
                 <TableCell>
                   <div className='flex flex-wrap gap-1'>
                     {displayTags.map((tag) => (
-                      <RemovableTag
+                      <BookmarkTag
                         key={tag}
                         tag={tag}
+                        bookmarkId={bookmark.id}
                         isSelected={selectedTags.includes(tag)}
                         onClick={onTagSelect}
                         onRemove={(tagToRemove, e) => handleRemoveTag(bookmark.id, tagToRemove, e)}

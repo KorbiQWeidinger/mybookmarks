@@ -115,11 +115,40 @@ export const { actions, reducer } = createSlice({
         saveBookmarksToStorage(state.bookmarks);
       }
     },
+    addTagToBookmark: (state, action: PayloadAction<{ bookmarkId: string; tag: string }>) => {
+      const { bookmarkId, tag } = action.payload;
+      const url = Object.keys(state.bookmarks).find(
+        (url) => state.bookmarks[url].id === bookmarkId
+      );
+
+      if (url && tag.trim() && !state.bookmarks[url].tags.includes(tag)) {
+        state.bookmarks[url].tags.push(tag);
+        saveBookmarksToStorage(state.bookmarks);
+      }
+    },
     deleteTagFromAllBookmarks: (state, action: PayloadAction<string>) => {
       const tagToDelete = action.payload;
 
       Object.keys(state.bookmarks).forEach((url) => {
         state.bookmarks[url].tags = state.bookmarks[url].tags.filter((tag) => tag !== tagToDelete);
+      });
+
+      saveBookmarksToStorage(state.bookmarks);
+    },
+    updateTagInAllBookmarks: (state, action: PayloadAction<{ oldTag: string; newTag: string }>) => {
+      const { oldTag, newTag } = action.payload;
+
+      if (oldTag === newTag || !newTag.trim()) {
+        return;
+      }
+
+      Object.keys(state.bookmarks).forEach((url) => {
+        if (state.bookmarks[url].tags.includes(oldTag)) {
+          // Remove the old tag and add the new one if it doesn't already exist
+          state.bookmarks[url].tags = state.bookmarks[url].tags
+            .filter((tag) => tag !== oldTag)
+            .concat(state.bookmarks[url].tags.includes(newTag) ? [] : [newTag]);
+        }
       });
 
       saveBookmarksToStorage(state.bookmarks);

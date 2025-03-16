@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useAppDispatch } from '@/store';
+import { useAppDispatch, useAppSelector } from '@/store';
 import { actions } from '@/store/slices/bookmarks-slice';
 import { Upload, FileUp, Check, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -22,6 +22,7 @@ interface BookmarkImportModalProps {
 
 export function BookmarkImportModal({ isOpen, onClose }: BookmarkImportModalProps) {
   const dispatch = useAppDispatch();
+  const bookmarks = useAppSelector((state) => state.bookmarks.bookmarks);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -31,6 +32,7 @@ export function BookmarkImportModal({ isOpen, onClose }: BookmarkImportModalProp
     success: boolean;
     message: string;
     count?: number;
+    skipped?: number;
   } | null>(null);
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -84,25 +86,28 @@ export function BookmarkImportModal({ isOpen, onClose }: BookmarkImportModalProp
 
     try {
       const text = await file.text();
-      const bookmarks = parseBookmarksFromHtml(text, setProgress);
+      const parsedBookmarks = parseBookmarksFromHtml(text, setProgress);
 
-      if (bookmarks.length === 0) {
+      if (parsedBookmarks.length === 0) {
         setImportResult({
           success: false,
           message: 'No valid bookmarks found in the file.',
         });
       } else {
-        // Add each bookmark to the store
-        let importedCount = 0;
-        bookmarks.forEach((bookmark) => {
+        // Count how many bookmarks would be skipped (already exist)
+        const skippedCount = parsedBookmarks.filter((bookmark) => bookmarks[bookmark.url]).length;
+        const importedCount = parsedBookmarks.length - skippedCount;
+
+        // Add each bookmark to the store (duplicates will be automatically skipped by the reducer)
+        parsedBookmarks.forEach((bookmark) => {
           dispatch(actions.addBookmark(bookmark));
-          importedCount++;
         });
 
         setImportResult({
           success: true,
-          message: `${importedCount} bookmarks imported successfully!`,
+          message: `${importedCount} bookmarks imported successfully. ${skippedCount > 0 ? `${skippedCount} duplicates skipped.` : ''}`,
           count: importedCount,
+          skipped: skippedCount,
         });
 
         // Reset file after successful import
@@ -194,10 +199,7 @@ export function BookmarkImportModal({ isOpen, onClose }: BookmarkImportModalProp
                 <AlertCircle className='h-4 w-4' />
               )}
               <AlertTitle>{importResult.success ? 'Success' : 'Error'}</AlertTitle>
-              <AlertDescription>
-                {importResult.message}
-                {importResult.count && ` Imported ${importResult.count} bookmarks.`}
-              </AlertDescription>
+              <AlertDescription>{importResult.message}</AlertDescription>
             </Alert>
           )}
         </div>
