@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, Import } from 'lucide-react';
 import { BookmarkModal } from './bookmark-modal';
+import { BookmarkImportModal } from './bookmark-import-modal';
 
 interface BookmarkHeaderProps {
   searchQuery: string;
@@ -11,6 +12,7 @@ interface BookmarkHeaderProps {
 
 export function BookmarkHeader({ searchQuery, onSearchChange }: BookmarkHeaderProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   return (
     <div className='p-4 border-b sticky top-0 bg-background z-10'>
@@ -26,6 +28,16 @@ export function BookmarkHeader({ searchQuery, onSearchChange }: BookmarkHeaderPr
           />
         </div>
         <Button
+          variant='outline'
+          size='icon'
+          className='flex-shrink-0'
+          title='Import bookmarks'
+          onClick={() => setIsImportModalOpen(true)}
+        >
+          <Import className='h-4 w-4' />
+          <span className='sr-only'>Import bookmarks</span>
+        </Button>
+        <Button
           size='icon'
           className='flex-shrink-0'
           title='Add bookmark'
@@ -37,6 +49,7 @@ export function BookmarkHeader({ searchQuery, onSearchChange }: BookmarkHeaderPr
       </div>
 
       <BookmarkModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <BookmarkImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} />
     </div>
   );
 }

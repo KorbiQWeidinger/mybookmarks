@@ -5,6 +5,7 @@ import { BookmarkList } from './bookmark-list';
 import type { ViewType } from '@/lib/types';
 import { useAppSelector } from '@/store';
 import { selectors } from '@/store/slices/bookmarks-slice';
+import { Button } from '@/components/ui/button';
 
 export function BookmarkManager() {
   const [viewType, setViewType] = useState<ViewType>('domain');
@@ -107,6 +108,3 @@ export function BookmarkManager() {
     </div>
   );
 }
-
-// Import Button for the settings modal
-import { Button } from '@/components/ui/button';

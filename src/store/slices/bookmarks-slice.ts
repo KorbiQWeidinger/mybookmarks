@@ -17,7 +17,7 @@ const loadBookmarksFromStorage = (): Bookmark[] => {
   } catch (error) {
     console.error('Failed to load bookmarks from localStorage:', error);
   }
-  // Return sample data if no bookmarks are found in localStorage
+  // Return empty array if no bookmarks are found in localStorage
   return [];
 };
 

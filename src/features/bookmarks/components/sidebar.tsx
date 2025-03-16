@@ -89,94 +89,96 @@ export function Sidebar({
           </Tabs>
         </div>
 
-        <ScrollArea className='flex-1 p-4'>
-          {viewType === 'domain' ? (
-            <div className='space-y-2'>
-              <div className='relative mb-4'>
-                <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
-                <Input
-                  placeholder='Search domains...'
-                  value={domainSearch}
-                  onChange={(e) => setDomainSearch(e.target.value)}
-                  className='pl-8 h-9'
-                />
-                {domainSearch && (
-                  <Button
-                    variant='ghost'
-                    size='icon'
-                    className='absolute right-1 top-1 h-7 w-7'
-                    onClick={() => setDomainSearch('')}
-                  >
-                    <X className='h-4 w-4' />
-                    <span className='sr-only'>Clear search</span>
-                  </Button>
-                )}
-              </div>
-
-              <h2 className='text-sm font-semibold text-muted-foreground mb-2'>Domains</h2>
-
-              {filteredDomains.length > 0 ? (
-                filteredDomains.map((domain) => (
-                  <Button
-                    key={domain.name}
-                    variant={selectedDomain === domain.name ? 'secondary' : 'ghost'}
-                    className='w-full justify-start text-left'
-                    onClick={() => onDomainSelect(domain.name)}
-                  >
-                    <span className='truncate flex-1'>{domain.name}</span>
-                    <Badge variant='outline' className='ml-2'>
-                      {domain.count}
-                    </Badge>
-                  </Button>
-                ))
-              ) : (
-                <p className='text-sm text-muted-foreground text-center py-2'>No domains found</p>
-              )}
-            </div>
-          ) : (
-            <div className='space-y-2'>
-              <div className='relative mb-4'>
-                <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
-                <Input
-                  placeholder='Search tags...'
-                  value={tagSearch}
-                  onChange={(e) => setTagSearch(e.target.value)}
-                  className='pl-8 h-9'
-                />
-                {tagSearch && (
-                  <Button
-                    variant='ghost'
-                    size='icon'
-                    className='absolute right-1 top-1 h-7 w-7'
-                    onClick={() => setTagSearch('')}
-                  >
-                    <X className='h-4 w-4' />
-                    <span className='sr-only'>Clear search</span>
-                  </Button>
-                )}
-              </div>
-
-              <h2 className='text-sm font-semibold text-muted-foreground mb-2'>Tags</h2>
-
-              {filteredTags.length > 0 ? (
-                <div className='flex flex-wrap gap-2'>
-                  {filteredTags.map((tag) => (
-                    <Badge
-                      key={tag.id}
-                      variant={selectedTags.includes(tag.id) ? 'default' : 'outline'}
-                      className='cursor-pointer'
-                      onClick={() => onTagSelect(tag.id)}
+        <div className='flex-1 overflow-hidden'>
+          <ScrollArea className='h-full px-4 py-4'>
+            {viewType === 'domain' ? (
+              <div className='space-y-2'>
+                <div className='relative mb-4'>
+                  <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
+                  <Input
+                    placeholder='Search domains...'
+                    value={domainSearch}
+                    onChange={(e) => setDomainSearch(e.target.value)}
+                    className='pl-8 h-9'
+                  />
+                  {domainSearch && (
+                    <Button
+                      variant='ghost'
+                      size='icon'
+                      className='absolute right-1 top-1 h-7 w-7'
+                      onClick={() => setDomainSearch('')}
                     >
-                      {tag.name} ({tag.count})
-                    </Badge>
-                  ))}
+                      <X className='h-4 w-4' />
+                      <span className='sr-only'>Clear search</span>
+                    </Button>
+                  )}
                 </div>
-              ) : (
-                <p className='text-sm text-muted-foreground text-center py-2'>No tags found</p>
-              )}
-            </div>
-          )}
-        </ScrollArea>
+
+                <h2 className='text-sm font-semibold text-muted-foreground mb-2'>Domains</h2>
+
+                {filteredDomains.length > 0 ? (
+                  filteredDomains.map((domain) => (
+                    <Button
+                      key={domain.name}
+                      variant={selectedDomain === domain.name ? 'secondary' : 'ghost'}
+                      className='w-full justify-start text-left'
+                      onClick={() => onDomainSelect(domain.name)}
+                    >
+                      <span className='truncate flex-1'>{domain.name}</span>
+                      <Badge variant='outline' className='ml-2'>
+                        {domain.count}
+                      </Badge>
+                    </Button>
+                  ))
+                ) : (
+                  <p className='text-sm text-muted-foreground text-center py-2'>No domains found</p>
+                )}
+              </div>
+            ) : (
+              <div className='space-y-2'>
+                <div className='relative mb-4'>
+                  <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
+                  <Input
+                    placeholder='Search tags...'
+                    value={tagSearch}
+                    onChange={(e) => setTagSearch(e.target.value)}
+                    className='pl-8 h-9'
+                  />
+                  {tagSearch && (
+                    <Button
+                      variant='ghost'
+                      size='icon'
+                      className='absolute right-1 top-1 h-7 w-7'
+                      onClick={() => setTagSearch('')}
+                    >
+                      <X className='h-4 w-4' />
+                      <span className='sr-only'>Clear search</span>
+                    </Button>
+                  )}
+                </div>
+
+                <h2 className='text-sm font-semibold text-muted-foreground mb-2'>Tags</h2>
+
+                {filteredTags.length > 0 ? (
+                  <div className='flex flex-wrap gap-2'>
+                    {filteredTags.map((tag) => (
+                      <Badge
+                        key={tag.id}
+                        variant={selectedTags.includes(tag.id) ? 'default' : 'outline'}
+                        className='cursor-pointer'
+                        onClick={() => onTagSelect(tag.id)}
+                      >
+                        {tag.name} ({tag.count})
+                      </Badge>
+                    ))}
+                  </div>
+                ) : (
+                  <p className='text-sm text-muted-foreground text-center py-2'>No tags found</p>
+                )}
+              </div>
+            )}
+          </ScrollArea>
+        </div>
 
         {/* Settings button at bottom of sidebar */}
         <div className='border-t p-4'>
