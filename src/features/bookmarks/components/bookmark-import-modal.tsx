@@ -13,7 +13,13 @@ import { actions } from '@/store/slices/bookmarks-slice';
 import { Upload, FileUp, Check, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
-import { parseBookmarksFromHtml, isValidBookmarkFile } from '@/features/bookmarks/utils';
+import {
+  parseBookmarksFromHtml,
+  parseBookmarksFromJson,
+  isValidBookmarkFile,
+  getBookmarkFileType,
+} from '@/features/bookmarks/utils';
+import { Bookmark } from '@/lib/Bookmark';
 
 interface BookmarkImportModalProps {
   isOpen: boolean;
@@ -56,7 +62,7 @@ export function BookmarkImportModal({ isOpen, onClose }: BookmarkImportModalProp
       } else {
         setImportResult({
           success: false,
-          message: 'Please upload an HTML file exported from Chrome.',
+          message: 'Please upload an HTML or JSON file.',
         });
       }
     }
@@ -71,7 +77,7 @@ export function BookmarkImportModal({ isOpen, onClose }: BookmarkImportModalProp
       } else {
         setImportResult({
           success: false,
-          message: 'Please upload an HTML file exported from Chrome.',
+          message: 'Please upload an HTML or JSON file.',
         });
       }
     }
@@ -86,7 +92,15 @@ export function BookmarkImportModal({ isOpen, onClose }: BookmarkImportModalProp
 
     try {
       const text = await file.text();
-      const parsedBookmarks = parseBookmarksFromHtml(text, setProgress);
+      const fileType = getBookmarkFileType(file);
+
+      let parsedBookmarks: Partial<Bookmark>[] = [];
+
+      if (fileType === 'html') {
+        parsedBookmarks = parseBookmarksFromHtml(text, setProgress);
+      } else if (fileType === 'json') {
+        parsedBookmarks = parseBookmarksFromJson(text, setProgress);
+      }
 
       if (parsedBookmarks.length === 0) {
         setImportResult({
@@ -95,12 +109,26 @@ export function BookmarkImportModal({ isOpen, onClose }: BookmarkImportModalProp
         });
       } else {
         // Count how many bookmarks would be skipped (already exist)
-        const skippedCount = parsedBookmarks.filter((bookmark) => bookmarks[bookmark.url]).length;
+        const skippedCount = parsedBookmarks.filter(
+          (bookmark) => bookmark.url && bookmarks[bookmark.url]
+        ).length;
         const importedCount = parsedBookmarks.length - skippedCount;
 
         // Add each bookmark to the store (duplicates will be automatically skipped by the reducer)
         parsedBookmarks.forEach((bookmark) => {
-          dispatch(actions.addBookmark(bookmark));
+          if (bookmark.title && bookmark.url && bookmark.domain) {
+            dispatch(
+              actions.addBookmark({
+                title: bookmark.title,
+                url: bookmark.url,
+                description: bookmark.description || '',
+                domain: bookmark.domain,
+                tags: bookmark.tags || [],
+                createdAt: bookmark.createdAt || new Date(),
+                favicon: bookmark.favicon,
+              })
+            );
+          }
         });
 
         setImportResult({
@@ -142,7 +170,8 @@ export function BookmarkImportModal({ isOpen, onClose }: BookmarkImportModalProp
         <DialogHeader>
           <DialogTitle>Import Bookmarks</DialogTitle>
           <DialogDescription>
-            Import bookmarks from an HTML file exported from Chrome.
+            Import bookmarks from an HTML file exported from Chrome or a JSON file exported from
+            this app.
           </DialogDescription>
         </DialogHeader>
 
@@ -164,7 +193,7 @@ export function BookmarkImportModal({ isOpen, onClose }: BookmarkImportModalProp
             ) : (
               <div className='flex flex-col items-center gap-2'>
                 <Upload className='h-10 w-10 text-muted-foreground' />
-                <p className='font-medium'>Drag and drop your HTML file here</p>
+                <p className='font-medium'>Drag and drop your file here</p>
                 <p className='text-sm text-muted-foreground'>or</p>
                 <Button
                   variant='outline'
@@ -177,9 +206,12 @@ export function BookmarkImportModal({ isOpen, onClose }: BookmarkImportModalProp
                   type='file'
                   ref={fileInputRef}
                   className='hidden'
-                  accept='.html,text/html'
+                  accept='.html,text/html,.json,application/json'
                   onChange={handleFileChange}
                 />
+                <p className='text-xs text-muted-foreground mt-2'>
+                  Supported formats: HTML (Chrome export), JSON (MyBookmarks export)
+                </p>
               </div>
             )}
           </div>

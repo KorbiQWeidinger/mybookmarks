@@ -2,6 +2,8 @@
  * Utility functions for importing bookmarks
  */
 
+import { Bookmark } from '@/lib/Bookmark';
+
 /**
  * Parse bookmarks from HTML file exported from Chrome
  */
@@ -74,8 +76,62 @@ export const parseBookmarksFromHtml = (html: string, onProgress?: (progress: num
 };
 
 /**
- * Validate if a file is a valid HTML bookmark file
+ * Parse bookmarks from JSON file exported from the app
+ */
+export const parseBookmarksFromJson = (json: string, onProgress?: (progress: number) => void) => {
+  try {
+    const data = JSON.parse(json);
+    const bookmarks: Partial<Bookmark>[] = [];
+    const entries = Object.entries(data);
+    const totalEntries = entries.length;
+
+    for (let i = 0; i < totalEntries; i++) {
+      const [_, bookmark] = entries[i] as [string, Partial<Bookmark>];
+
+      // Ensure the bookmark has all required fields
+      if (bookmark && bookmark.title && bookmark.url) {
+        // Convert createdAt string back to Date object
+        const processedBookmark = {
+          ...bookmark,
+          createdAt: bookmark.createdAt ? new Date(bookmark.createdAt.toString()) : new Date(),
+        };
+
+        bookmarks.push(processedBookmark);
+      }
+
+      // Update progress
+      if (onProgress) {
+        onProgress(Math.round(((i + 1) / totalEntries) * 100));
+      }
+    }
+
+    return bookmarks;
+  } catch (error) {
+    console.error('Error parsing JSON bookmarks:', error);
+    return [];
+  }
+};
+
+/**
+ * Validate if a file is a valid bookmark file
  */
 export const isValidBookmarkFile = (file: File): boolean => {
-  return file.type === 'text/html' || file.name.endsWith('.html');
+  return (
+    file.type === 'text/html' ||
+    file.name.endsWith('.html') ||
+    file.type === 'application/json' ||
+    file.name.endsWith('.json')
+  );
+};
+
+/**
+ * Determine the type of bookmark file
+ */
+export const getBookmarkFileType = (file: File): 'html' | 'json' | null => {
+  if (file.type === 'text/html' || file.name.endsWith('.html')) {
+    return 'html';
+  } else if (file.type === 'application/json' || file.name.endsWith('.json')) {
+    return 'json';
+  }
+  return null;
 };
