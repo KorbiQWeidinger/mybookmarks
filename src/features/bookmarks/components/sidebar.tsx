@@ -160,7 +160,6 @@ function TagList({ tags, selectedTags, onTagSelect }: TagListProps) {
               isSelected={selectedTags.includes(tag.id)}
               onClick={() => onTagSelect(tag.name)}
               variant='trash'
-              allTags={tags}
               className='inline-flex'
             />
           ))}
