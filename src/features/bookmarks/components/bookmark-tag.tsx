@@ -16,6 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Tag } from '@/lib/Bookmark';
 
 interface BookmarkTagProps {
   tag: string;
@@ -25,7 +26,7 @@ interface BookmarkTagProps {
   onClick?: (tag: string) => void;
   onRemove?: (tag: string, e: MouseEvent) => void;
   variant?: 'x' | 'trash';
-  allTags?: { id: string; name: string; count: number }[];
+  allTags?: Tag[];
   className?: string;
 }
 
@@ -37,15 +38,15 @@ export function BookmarkTag({
   onClick,
   onRemove,
   variant = 'x',
-  allTags = [],
+  // allTags = [],
   className,
 }: BookmarkTagProps) {
   const dispatch = useAppDispatch();
-  const [isEditing, setIsEditing] = useState(false);
-  const [editValue, setEditValue] = useState(tag);
-  const [showMergeDialog, setShowMergeDialog] = useState(false);
+  const [editTag, setEditTag] = useState<string | null>(null);
+  // const [editValue, setEditValue] = useState(tag);
+  // const [showMergeDialog, setShowMergeDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [hasDuplicateTag, setHasDuplicateTag] = useState(false);
+  // const [hasDuplicateTag, setHasDuplicateTag] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleRemove = (e: MouseEvent) => {
@@ -53,13 +54,10 @@ export function BookmarkTag({
     e.preventDefault();
 
     if (variant === 'trash') {
-      // For sidebar tags, show confirmation dialog
       setShowDeleteDialog(true);
     } else if (bookmarkId && onRemove) {
-      // For individual bookmark tags
       onRemove(tag, e);
     } else if (bookmarkId) {
-      // Direct dispatch if no onRemove handler
       dispatch(actions.removeTagFromBookmark({ bookmarkId, tag }));
     }
   };
@@ -72,94 +70,71 @@ export function BookmarkTag({
   const handleEdit = (e: MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    setIsEditing(true);
+    setEditTag(tag);
   };
 
-  const saveTagEdit = (newTag: string) => {
+  const saveTagEdit = () => {
+    if (!editTag) return;
+
     // Normalize the tag values for comparison
-    const normalizedNewTag = newTag.trim();
+    const normalizedNewTag = editTag.trim();
     const normalizedOriginalTag = tag.trim();
 
-    // Only proceed if the tag actually changed (not just whitespace changes)
-    if (normalizedNewTag && normalizedNewTag !== normalizedOriginalTag) {
-      // Check if tag already exists
-      const tagExists = allTags.some((t) => t.name === normalizedNewTag);
+    if (normalizedNewTag === normalizedOriginalTag) return;
 
-      if (tagExists) {
-        setEditValue(normalizedNewTag);
-        setHasDuplicateTag(true);
-        setShowMergeDialog(true);
-        return; // Don't exit editing mode yet
-      }
+    // Check if tag already exists
+    // const tagExists = allTags.some((t) => t.name === normalizedNewTag);
 
-      if (bookmarkId) {
-        // For individual bookmark tags
-        // First remove the old tag
-        dispatch(actions.removeTagFromBookmark({ bookmarkId, tag }));
-
-        // Then add the new tag
-        dispatch(actions.addTagToBookmark({ bookmarkId, tag: normalizedNewTag }));
-      } else {
-        // Update tag across all bookmarks
-        dispatch(actions.updateTagInAllBookmarks({ oldTag: tag, newTag: normalizedNewTag }));
-      }
+    if (bookmarkId) {
+      dispatch(actions.removeTagFromBookmark({ bookmarkId, tag }));
+      dispatch(actions.addTagToBookmark({ bookmarkId, tag: normalizedNewTag }));
+    } else {
+      dispatch(actions.updateTagInAllBookmarks({ oldTag: tag, newTag: normalizedNewTag }));
     }
-
-    setHasDuplicateTag(false);
-    setIsEditing(false);
   };
 
   const handleSave = (e: MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    saveTagEdit(editValue.trim());
+    saveTagEdit();
   };
 
-  const confirmMergeTag = () => {
-    const normalizedNewTag = editValue.trim();
-    const normalizedOriginalTag = tag.trim();
+  // const confirmMergeTag = () => {
+  //   const normalizedNewTag = editValue.trim();
+  //   const normalizedOriginalTag = tag.trim();
 
-    if (normalizedNewTag && normalizedNewTag !== normalizedOriginalTag) {
-      dispatch(actions.updateTagInAllBookmarks({ oldTag: tag, newTag: normalizedNewTag }));
-    }
-    setShowMergeDialog(false);
-    setHasDuplicateTag(false);
-    setIsEditing(false);
-  };
+  //   if (normalizedNewTag && normalizedNewTag !== normalizedOriginalTag) {
+  //     dispatch(actions.updateTagInAllBookmarks({ oldTag: tag, newTag: normalizedNewTag }));
+  //   }
+  //   setShowMergeDialog(false);
+  //   setHasDuplicateTag(false);
+  //   setIsEditing(false);
+  // };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      saveTagEdit(editValue.trim());
+      saveTagEdit();
     } else if (e.key === 'Escape') {
-      setEditValue(tag);
-      setHasDuplicateTag(false);
-      setIsEditing(false);
+      setEditTag(null);
     }
   };
 
   // Focus input when editing starts
   useEffect(() => {
-    if (isEditing && inputRef.current) {
+    if (editTag && inputRef.current) {
       inputRef.current.focus();
     }
-  }, [isEditing]);
+  }, [editTag]);
 
-  if (isEditing) {
+  if (editTag) {
     return (
       <div className='flex items-center mb-1 max-w-[150px]' onClick={(e) => e.stopPropagation()}>
         <Input
           ref={inputRef}
-          value={editValue}
-          onChange={(e) => setEditValue(e.target.value)}
+          value={editTag}
+          onChange={(e) => setEditTag(e.target.value)}
           onKeyDown={handleKeyDown}
-          onBlur={() => {
-            // Only call saveTagEdit if we're not showing the merge dialog
-            // and we haven't detected a duplicate tag
-            if (!showMergeDialog && !hasDuplicateTag) {
-              saveTagEdit(editValue);
-            }
-          }}
           className='h-6 text-xs py-0 px-2'
           onClick={(e) => e.stopPropagation()}
         />
@@ -225,7 +200,7 @@ export function BookmarkTag({
       </Badge>
 
       {/* Merge Tag Dialog */}
-      <AlertDialog
+      {/* <AlertDialog
         open={showMergeDialog}
         onOpenChange={(open) => {
           setShowMergeDialog(open);
@@ -250,7 +225,7 @@ export function BookmarkTag({
             <AlertDialogAction onClick={confirmMergeTag}>Merge Tags</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+      </AlertDialog> */}
 
       {/* Delete Tag Dialog */}
       {variant === 'trash' && (
