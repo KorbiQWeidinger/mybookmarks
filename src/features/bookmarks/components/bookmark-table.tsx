@@ -58,12 +58,14 @@ export function BookmarkTable({ bookmarks, selectedTags, onTagSelect }: Bookmark
   };
 
   return (
-    <div className='w-full overflow-auto'>
+    <div className='w-full overflow-x-auto overflow-y-auto'>
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className='w-[300px]'>Title</TableHead>
-            <TableHead className='hidden md:table-cell'>Description</TableHead>
+            <TableHead className='w-[300px] max-w-[400px]'>Title</TableHead>
+            <TableHead className='hidden md:table-cell w-[300px] max-w-[400px]'>
+              Description
+            </TableHead>
             <TableHead className='w-[600px]'>Tags</TableHead>
             <TableHead className='w-[100px]'></TableHead>
           </TableRow>
@@ -82,31 +84,35 @@ export function BookmarkTable({ bookmarks, selectedTags, onTagSelect }: Bookmark
                       <img
                         src={bookmark.favicon || ''}
                         alt=''
-                        className='w-4 h-4 mt-1'
+                        className='w-4 h-4 mt-1 flex-shrink-0'
                         onError={(e) => {
                           (e.target as HTMLImageElement).style.display = 'none';
                         }}
                       />
                     )}
                     {bookmark.favicon === null && (
-                      <div className='w-4 h-4 mt-1 bg-muted rounded-full' />
+                      <div className='w-4 h-4 mt-1 bg-muted rounded-full flex-shrink-0' />
                     )}
-                    <div>
+                    <div className='min-w-0'>
                       <a
                         href={bookmark.url}
                         target='_blank'
                         rel='noopener noreferrer'
                         className='hover:underline flex items-center gap-1 group'
                       >
-                        <span>{bookmark.title}</span>
-                        <ExternalLink className='h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity' />
+                        <span className='truncate block max-w-[250px]'>{bookmark.title}</span>
+                        <ExternalLink className='h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0' />
                       </a>
-                      <p className='text-xs text-muted-foreground'>{bookmark.domain}</p>
+                      <p className='text-xs text-muted-foreground truncate max-w-[250px]'>
+                        {bookmark.domain}
+                      </p>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell className='hidden md:table-cell text-muted-foreground'>
-                  <p className='line-clamp-2 text-sm'>{bookmark.description}</p>
+                  <p className='truncate text-sm max-w-[250px]' title={bookmark.description}>
+                    {bookmark.description}
+                  </p>
                 </TableCell>
                 <TableCell>
                   <div className='flex flex-wrap gap-1'>
