@@ -167,13 +167,13 @@ export function BookmarkTag({
           {tag}
           {count !== undefined && ` (${count})`}
         </span>
-        <div className='absolute right-1 flex items-center h-full opacity-0 group-hover:opacity-100 transition-opacity dark:hover:bg-none'>
+        <div className='absolute right-1 flex items-center h-full opacity-0 group-hover:opacity-100 transition-opacity'>
           <Button
             variant='ghost'
             size='icon-sm'
             className={cn(
-              'p-0 h-3 pl-3 pr-2 w-3 hover:bg-muted/60 rounded-sm',
-              'hover:text-muted-foreground hover:bg-none'
+              'p-0 h-3 pl-3 pr-2 w-3 rounded-sm',
+              'hover:text-muted-foreground hover:bg-transparent dark:hover:bg-transparent'
             )}
             onClick={handleEdit}
             onMouseDown={(e) => e.stopPropagation()}
@@ -186,7 +186,7 @@ export function BookmarkTag({
             variant='ghost'
             size='icon-sm'
             className={cn(
-              'p-0 px-1 h-3 w-3 hover:bg-muted/60 rounded-sm ml-1 hover:bg-none dark:hover:bg-none',
+              'p-0 px-1 h-3 w-3 rounded-sm ml-1 hover:bg-transparent dark:hover:bg-transparent',
               variant === 'trash' ? 'hover:text-destructive' : 'hover:text-muted-foreground'
             )}
             onClick={handleRemove}
